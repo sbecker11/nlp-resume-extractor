@@ -1,0 +1,161 @@
+{
+    "name": "named-resume-schema",
+    "description": "A JSON schema for a resume",
+    "strict": true,
+    "schema": {
+        "type": "object",
+        "properties": {
+            "contactInformation": {
+                "description": "The person's contact information might include FirstName, LastName, Email, Phone, Address, City, State, Zip, Country",
+                "type": "string"
+            },
+            "positionOrProfessionalTitle": {
+                "description": "The position or professional title of the person, such as 'Software Engineer' or 'Data Scientist'",
+                "type": "string"
+            },
+            "professionalSummary": {
+                "description": "A brief summary, no more than 4 sentences, of the person's professional experience and goals in their career",
+                "type": "string"
+            },
+            "workExperience": {
+                "description": "A list of the person's work experience or jobs that they have held",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "companyName": {
+                            "description": "The name of the company the person worked for",
+                            "type": "string"
+                        },
+                        "locationOrRemote": {
+                            "description": "The location of where the person worked for the company, like 'San Francisco, CA', Or Remote if the person worked from home",
+                            "type": "string"
+                        },
+                        "duration": {
+                            "description": "The start and end dates of the person's' employment at the company, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",    
+                            "type": "object",
+                            "properties": {
+                                "start": {
+                                    "description": "The start date of the person's employment at the company",
+                                    "type": "string"
+                                },
+                                "end": {
+                                    "description": "The end date of the person's employment at the company",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "end",
+                                "start"
+                            ]
+                        },
+                        "positionOrTitle": {
+                            "description": "The position or title the person held at the company, such as 'Software Engineer' or 'Data Scientist'",
+                            "type": "string"
+                        },
+                        "responsibilitiesAccomplishments": {
+                            "description": "A list of the person's responsibilities or noteable accomplishments during their time at the company",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": [
+                        "companyName",
+                        "duration",
+                        "locationOrRemote",
+                        "positionOrTitle",
+                        "responsibilitiesAccomplishments"
+                    ]
+                }
+            },
+            "education": {
+                "description": "A list of the person's education history, including degrees and institutions",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "institution": {
+                            "description": "The name of the institution the person attended, such as 'Stanford University' or 'UC Berkeley'",
+                            "type": "string"
+                        },
+                        "degree": {
+                            "description": "The degree the person earned at the institution, such as ('BS' or 'Bachelor of Science'), or ('MFA' or 'Master of Fine Arts')",
+                            "type": "string"
+                        },
+                        "focus"; {
+                            "description": "The focus or major of the person's degree, such as 'Computer Science' or 'Art History'",
+                            "type": "string"
+                        },
+                        "gradePointAveage": {
+                            "description": "The grade or GPA the person earned while attending the institution, such as '3.5' or 'B+'",
+                            "type": "string"
+                        },
+                        "duration": {
+                            "description": "The start and end dates of the person's attendance at the institution, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",
+                            "type": "object",
+                            "properties": {
+                                "start": {
+                                    "description": "The start date of the person's attendance at the institution",
+                                    "type": "string"
+                                },
+                                "end": {
+                                    "description": "The end date of the person's attendance at the institution",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "end",
+                                "start"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "duration",
+                        "gradePointAveage",
+                        "focus",
+                        "degree",
+                        "institution"
+                    ]
+                }
+            },
+            "skills": {
+                "description": "A comma-separated list of the person's skills, such as 'Python', 'Machine Learning', 'React', 'Data Analysis'",
+                "type": "string"
+            },
+            "certifications": {
+                "description": "A comma-separated list of the person's certifications, such as 'AWS Certified Solutions Architect', 'Google Analytics Certified'",
+                "type": "string"
+            },
+            "publications": {
+                "description": "A list of the person's publications, such as books, articles, or research papers",
+                "type": "string"
+            },
+            "patents": {
+                "description": "A list of the person's patents or inventions",
+                "type": "string"
+            },
+            "websites": {
+                "type": "array",
+                "items": {
+                    "description": "A list of the person's websites or online profiles, such as LinkedIn, GitHub, or a URL to their personal website",
+                    "type": "string"
+                }
+            }
+        },
+        "required": [
+            "certifications",
+            "contactInformation",
+            "education",
+            "patents",
+            "positionOrProfessionalTitle",
+            "professionalSummary",
+            "publications",
+            "skills",
+            "websites",
+            "workExperience"
+        ],
+        "additionalProperties": false
+    }
+}
