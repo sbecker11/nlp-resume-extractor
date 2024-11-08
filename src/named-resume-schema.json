@@ -14,8 +14,8 @@
                 "type": "string"
             },
             "professionalSummary": {
-                "description": "A brief summary, no more than 4 sentences, of the person's professional experience and goals in their career",
-                "type": "string"
+                "description": "An optional brief summary, no more than 4 sentences, of the person's professional experience and goals in their career",
+                "type": ["string", "null"]
             },
             "workExperience": {
                 "description": "A list of the person's work experience or jobs that they have held",
@@ -32,8 +32,8 @@
                             "type": "string"
                         },
                         "duration": {
-                            "description": "The start and end dates of the person's' employment at the company, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",    
-                            "type": "object",
+                            "description": "The optional start and end dates of the person's' employment at the company, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",    
+                            "type": ["object" , "null"],
                             "properties": {
                                 "start": {
                                     "description": "The start date of the person's employment at the company",
@@ -54,9 +54,10 @@
                             "type": "string"
                         },
                         "responsibilitiesAccomplishments": {
-                            "description": "A list of the person's responsibilities or noteable accomplishments during their time at the company",
+                            "description": "A list of sentences describing the person's responsibilities or noteable accomplishments during their time at the company",
                             "type": "array",
                             "items": {
+                                "description": "A sentence describing a responsibility or accomplishment of the person during their time at the company",
                                 "type": "string"
                             }
                         }
@@ -71,7 +72,7 @@
                 }
             },
             "education": {
-                "description": "A list of the person's education history, including degrees and institutions",
+                "description": "A list of the person's education history, including institutions, degrees and majors",
                 "type": "array",
                 "items": {
                     "type": "object",
@@ -84,25 +85,25 @@
                             "description": "The degree the person earned at the institution, such as ('BS' or 'Bachelor of Science'), or ('MFA' or 'Master of Fine Arts')",
                             "type": "string"
                         },
-                        "focus"; {
+                        "major": {
                             "description": "The focus or major of the person's degree, such as 'Computer Science' or 'Art History'",
                             "type": "string"
                         },
-                        "gradePointAveage": {
-                            "description": "The grade or GPA the person earned while attending the institution, such as '3.5' or 'B+'",
-                            "type": "string"
+                        "gradePointAverage": {
+                            "description": "The optional grade point average (GPA) the person earned while attending the institution, such as '3.5' or 'B+'",
+                            "type": ["string","null"]
                         },
                         "duration": {
-                            "description": "The start and end dates of the person's attendance at the institution, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",
-                            "type": "object",
+                            "description": "The optional start and end dates of the person's attendance at the institution, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",
+                            "type": ["object", "null"],
                             "properties": {
                                 "start": {
-                                    "description": "The start date of the person's attendance at the institution",
-                                    "type": "string"
+                                    "description": "The optional start date of the person's attendance at the institution",
+                                    "type": ["string", "null"]
                                 },
                                 "end": {
-                                    "description": "The end date of the person's attendance at the institution",
-                                    "type": "string"
+                                    "description": "The optional end date of the person's attendance at the institution",
+                                    "type": ["string","null"]
                                 }
                             },
                             "required": [
@@ -113,8 +114,8 @@
                     },
                     "required": [
                         "duration",
-                        "gradePointAveage",
-                        "focus",
+                        "gradePointAverage",
+                        "major",
                         "degree",
                         "institution"
                     ]
