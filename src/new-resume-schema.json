@@ -1,0 +1,172 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/resume-schema/",
+    "title": "Resume Schema",
+    "description": "A JSON schema for a comprehensive resume format.",
+    "type": "object",
+    "properties": {
+      "contactInformation": {
+        "description": "The person's contact information",
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "description": "The person's first name",
+            "type": "string"
+          },
+          "lastName": {
+            "description": "The person's last name",
+            "type": "string"
+          },
+          "email": {
+            "description": "The person's email address",
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "description": "Optional, the person's phone number",
+            "type": ["string", "null"]
+          },
+          "address": {
+            "description": "Optional, the person's street address",
+            "type": ["string", "null"]
+          },
+          "city": {
+            "description": "Optional, the person's city",
+            "type": ["string", "null"]
+          },
+          "state": {
+            "description": "Optional, the person's state or province",
+            "type": ["string", "null"]
+          },
+          "zipcode": {
+            "description": "Optional, the person's postal code",
+            "type": ["string", "null"]
+          },
+          "country": {
+            "description": "Optional, the person's country, such as 'United States'",
+            "type": ["string","null"]
+          }
+        },
+        "required": ["firstName", "lastName", "email", "phone", "address", "city", "state", "zipcode", "country"],
+        "additionalProperties": false
+      },
+      "workHistory": {
+        "description": "The person's work history",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "workPositionOrTitle": {
+              "description": "Job title or position",
+              "type": "string"
+            },
+            "workForCompanyName": {
+              "description": "Company name",
+              "type": "string"
+            },
+            "workLocationOrRemote": {
+              "description": "Optional work location, such as 'Phoenix, AZ' or 'remote'",
+              "type": ["string", "null"]
+            },
+            "workDuration": {
+              "description": "Optional employment duration",
+              "type": ["object", "null"],
+              "properties": {
+                "start": {
+                  "description": "Start date of employment",
+                  "type": "string"
+                },
+                "end": {
+                  "description": "End date of employment",
+                  "type": ["string", "null"]
+                }
+              },
+              "required": ["start"],
+              "additionalProperties": false
+            },
+            "workResponsibilitiesAccomplishments": {
+              "description": "Job responsibilities or notable accomplishments",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": ["workPositionOrTitle", "workForCompanyName", "workLocationOrRemote", "workDuration", "workResponsibilitiesAccomplishments"],
+          "additionalProperties": false
+        }
+      },
+      "educationHistory": {
+        "description": "Educational background of the person",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "institution": {
+              "description": "Name of the educational institution",
+              "type": "string"
+            },
+            "degree": {
+              "description": "Degree earned",
+              "type": "string"
+            },
+            "majors": {
+              "description": "Optional comma-separated list of majors",
+              "type": ["string", "null"]
+            },
+            "minors": {
+              "description": "Optional comma-separated list of minors",
+              "type": ["string", "null"]
+            },
+            "gradePointAverage": {
+              "description": "Optional Grade Point Average",
+              "type": ["string", "null"]
+            },
+            "duration": {
+              "description": "Optional duration of education",
+              "type": ["object", "null"],
+              "properties": {
+                "start": {
+                  "description": "Start date of education",
+                  "type": ["string", "null"]
+                },
+                "end": {
+                  "description": "End date of education",
+                  "type": ["string", "null"]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["institution", "degree", "majors", "gradePointAverage", "duration"],
+          "additionalProperties": false
+        }
+      },
+      "skills": {
+        "description": "Optional comma-separated list of the user's skills",
+        "type": ["string", "null"]
+      },
+      "certifications": {
+        "description": "Optional comma-separated list of the user's certifications",
+        "type": ["string", "null"]
+      },
+      "publications": {
+        "description": "Optional comma-separated list of the user's publications",
+        "type": ["string", "null"]
+      },
+      "patents": {
+        "description": "Optional comma-separated list of the user's patents",
+        "type": ["string", "null"]
+      },
+      "websites": {
+        "description": "Optional comma-separated list of the user's websites or online profiles",
+        "type": ["array", "null"],
+        "items": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "required": ["contactInformation", "workHistory", "educationHistory","skills","certifications","publications","patents","websites"],
+    "additionalProperties": false
+  }

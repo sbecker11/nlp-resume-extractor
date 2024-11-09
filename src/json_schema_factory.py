@@ -3,7 +3,8 @@ Module for processing, validating, and using any json-schema object
 """
 import json
 import logging
-from jsonschema import Draft7Validator, validate
+from typing import Optional
+from jsonschema import Draft7Validator
 from jsonschema.exceptions import ValidationError, SchemaError
 
 logging.basicConfig(
@@ -74,61 +75,51 @@ def read_json_schema_file(json_schema_file:str) -> dict:
         raise ValueError("Error: invalid ison schema")
     return json_schema
 
-# This should probably be removed.
-# Define the required elements in a JSON schema object
-# used to validate the structural integrity of the schema object
-static_required_name_types = {
-    "$schema": str,
-    "type": str,
-}
-# This should probably be removed.
-# Define the optional elements in a JSON schema object
-# used to validate the structural integrity of the schema object
-static_optional_name_types = {
-    "additionalItems": bool,
-    "additionalProperties": bool,
-    "const": type,
-    "contentEncoding": str,
-    "contentMediaType": str,
-    "definitions": dict,
-    "dependencies": dict,
-    "enum": list,
-    "exclusiveMaximum": (int, float),
-    "exclusiveMinimum": (int, float),
-    "format": str,
-    "items": dict,
-    "maximum": (int, float),
-    "maxItems": int,
-    "maxLength": int,
-    "maxProperties": int,
-    "minimum": (int, float),
-    "minItems": int,
-    "minLength": int,
-    "minProperties": int,
-    "multipleOf": (int, float, type),
-    "pattern": str,
-    "patternProperties": dict,
-    "propertyNames": dict,
-    "uniqueItems": bool,
-    "examples": list,
-    "if": dict,
-    "then": dict,
-    "else": dict,
-    "allOf": list,
-    "anyOf": list,
-    "oneOf": list,
-    "not": dict,
-    "contains": dict
-}
-"""
-Raises:
-    ValueError: Invalid or empty json schema:
-    ValueError: Invalid or empty legitimateDataObject
-    ValueError: Undefined or invalid data object
 
-Returns:
-    JsonSchemaFactory: an instance of the JsonSchemaFactory class
-"""
+def external_validate_data_object(json_schema: dict, data_object: object) -> bool:
+    """
+    Validates a given data object against the given json schema outside of the 
+    JsonSchemaFactory class. Returns True if the data object is valid against the schema,
+    raises Errors otherwise.
+
+    Args:
+        json_schema (dict): The json schema object
+        data_object (dict): The JSON object to be validated.
+
+    Returns:
+        bool: True if the data object is valid against the json_schema,
+        raises Errors otherwise
+
+    Raises:
+        ValueError: If the schema is undefined or invalid
+        ValueError: If the data object is undefined or invalid
+        ValidationError: If the validator is invalid
+        SchemaError: If the json schema is invalid
+        Exception: For any other error
+    """
+    try:
+        if not isinstance(json_schema, dict):
+            raise ValueError("Error: invalid json schema")
+        if not isinstance(data_object, dict):
+            raise ValueError("Error: invalid data object")
+
+        validator = Draft7Validator(json_schema)
+        validator.validate(instance=data_object)
+        return True
+
+    except ValueError as e:
+        logger.error("Value error: %s", str(e))
+        raise
+    except ValidationError as e:
+        logger.error("Validation error: %s", str(e))
+        raise
+    except SchemaError as e:
+        logger.error("Schema validation error: %s", str(e))
+        raise
+    except Exception as e:
+        logger.error("Error: %s", str(e))
+        raise
+
 
 class JsonSchemaFactory:
     """
@@ -137,44 +128,42 @@ class JsonSchemaFactory:
 
     Attributes:
         json_schema_path (str): The to the JSON schema file.
-        legitimate_data_object_path (str): The path to the legitimate data object.
+        optional_test_data_object_path Optional[str]: The optional path to the test data object.
         validator (Draft7Validator): The JSON schema validator.
 
     Methods:
-        __init__(json_schema_path, legitimate_data_object_path):
+        __init__(json_schema_path, optinal_test_data_object_path):
             Loads the json schema 
-            loads the legitimate data object - an object which 
-            is known to be valid against the json-schema.
-
-        check_structural_integrity(schema_object):
-            Checks the structural validity of the given schema object
-            returns True if the json schema is valid, raises SchemaError if not.
+            loads the test data object if the optinal_test_data_object_path is defined
 
         validate_data_object(data_object):
-            Validates the given data object against the loaded JSON 
-            returns True if the json schema is valid, raises SchemaError if not.
+            Validates the given data object against the validated json schema
+            returns True if the json schema is valid, raises ValidationError if not.
             
         check_schema_validity(schema):
-            Validates the given data object against the Draft7Validator 
+            Validates the given json schema against the Draft7Validator 
             returns True if the json schema is valid, raises SchemaError if not.
             
-    Exce[ption]:
+    Raises:
         ValueError: If the JSON schema file is does not contain a JSON object.
-        ValueError: If the legitimate data object file does not contain a JSON object.
-        SchemaError: if the json schema fails the structural integrity check,
+        ValueError: If the test data object file does not contain a JSON object.
         SchemaError: If the JSON schema fails the test against the legititmate data object.
         SchemaError: If the JSON schema fails the test against the Draft7Validator.
 
     """
-    def __init__(self, json_schema_path, legitimate_data_object_path):
+    def __init__(self, json_schema_path:str, optional_test_data_object_path: Optional[str] = None):
 
         candidate_json_schema = read_json_schema_file(json_schema_path)
         if not candidate_json_schema:
-            raise ValueError(f"Invalid or empty json schema: {json_schema_path}")
+            raise ValueError(f"Error: json schema file path invalid: {json_schema_path}")
 
-        legitimate_data_object = read_json_file(legitimate_data_object_path)
-        if not legitimate_data_object:
-            raise ValueError(f"Error: Invalid or empty legitimateDataObject: {legitimate_data_object_path}")
+        # optional test data object used to validate the schema
+        self.test_data_object = None
+        if optional_test_data_object_path:
+            self.test_data_object = read_json_file(optional_test_data_object_path)
+            if not self.test_data_object:
+                raise ValueError(f"Error: optional_test_path invalid: \
+                    {optional_test_data_object_path}")
 
         self.validated_json_schema = None
         self.validator = None
@@ -182,9 +171,16 @@ class JsonSchemaFactory:
         ## apply the different json schema validation checks
         self.check_schema_validity(candidate_json_schema)
 
-        self.check_structural_integrity(candidate_json_schema)
-
-        self.validate_data_object(legitimate_data_object)
+        # optional check against a test data object
+        if self.test_data_object:
+            try:
+                external_validate_data_object(candidate_json_schema, self.test_data_object)
+            except ValidationError as e:
+                raise SchemaError(f"Error: json schema failed test against \
+                    known test data object: {e.message}") from e
+            except SchemaError as e:
+                raise SchemaError(f"Error: json schema failed test against \
+                    Draft7Validator: {e.message}") from e
 
         # If all checks pass, save the validated_json_schema
         # and use it to create a Draft7Validator instance
@@ -208,107 +204,42 @@ class JsonSchemaFactory:
         return self.validated_json_schema
 
 
-    def validate_instance(self, instance: object, schema: dict) -> bool:
+    def validate_instance(self, instance: object) -> bool:
         """
-        Validates a given instance against a given schema.
+        Validates a given instance against the factory's validated schema.
         logs validation errors if any and returns False if 
         the instance is invalid against the schema, True otherwise.
 
         Args:
             instance (_type_): _description_
-            schema (_type_): _description_
 
         Returns:
-            _type_: _description_
-        """
-        try:
-            validate(instance=instance, schema=schema)
-            return True
-        except ValidationError as e:
-            logger.error("Validation error: %s", e.message)
-            return False
-        except SchemaError as e:
-            print("Schema error: %s", e.message)
-            return False
-
-
-    def validate_data_object(self, data_object) -> bool:
-        """
-        Validates a given data object against the predefined JSON schema of the factory.
-
-        Args:
-            data_object (dict): The JSON object to be validated.
-
-        Returns:
-            bool: True if the data object is valid against the json_schema, False otherwise.
-
-        Raises:
-            None.
-        """
-        try:
-            validate(instance=data_object, schema=self.validated_json_schema)
-            return True
-        except ValidationError as e:
-            logger.error("Insance validation error: %s", e.message)
-            return False
-        except SchemaError as e:
-            logger.error("Schema validation error: %s", e.message)
-            return False
-
-    def count_schema_name_type_check_failures(self, schema_object:dict, name_types:dict) -> int:
-        """
-        Checks the structural validity of the given JSON schema object.
-        This method counts the number of name_types that the json schema
-        object does not have.
-
-        Parameters:
-        schema_object (dict): The JSON schema object to be validated.
-        name_types (dict): A dictionary of the expected types for each 
-        element in the schema_object.
-        
-        Returns:
-            int: the number of check failures
-        Raises:
+            bool: True if the instance is valid, returns False otherwise 
+            
+        Raises: (logs them only, does not raise exceptions)
+            ValueError: If the validator is undefined
+            ValueError: If the validated_schema is undefined
+            ValidationError: If the instance is invalid against the schema
             SchemaError: If the schema is invalid
         """
-        if schema_object is None or not isinstance(schema_object, dict):
-            logger.error("schemaObject is not a dictionary")
-            return False
+        try:
+            if self.validator is None:
+                raise ValueError("Error: validator is undefined")
+            if self.validated_json_schema is None:
+                raise ValueError("Error: validated_schema is undefined")
 
-        num_failures = 0
-        names = name_types.keys()
-        for name in names:
-            if name in schema_object:
-                expected_type = name_types[name]
-                actual_type = schema_object[name]
-                if isinstance(expected_type, tuple):
-                    if actual_type not in expected_type:
-                        logger.error("schemaObject.%s is not in type %s", name, expected_type)
-                        num_failures += 1
-                    elif isinstance(expected_type, str):
-                        if actual_type != expected_type:
-                            logger.error("schemaObject.%s is not of type %s", name, expected_type)
-                            num_failures += 1
-                    else:
-                        logger.error("schemaObject.%s has unhandled type %s", name, actual_type)
-                        num_failures += 1
-                        
-        return num_failures == 0
-                            
-             
-
-    def check_structural_integrity(self, schema_object:dict, name_types: dict) -> bool:
-        """
-        Checks the structural validity of the given JSON schema object.
-        This method verifies that the elements in the provided schema_object
-        """
-        total_failures = count_schema_name_type_check_failures(schema_object, static_required_name_types)
-        if total_failures == 0:
+            self.validator.validate(instance=instance)
             return True
-        else:
-            schema_error_message = \
-                f"Structural integrity checks totalled {total_failures} check failures"
-            raise SchemaError(schema_error_message)
+
+        except ValueError as e:
+            logger.error("Value error: %s", str(e))
+            return False
+        except ValidationError as e:
+            logger.error("Validation error: %s", str(e))
+            return False
+        except SchemaError as e:
+            logger.error("Schema error: %s", str(e))
+            return False
 
 
     def check_schema_validity(self, schema:dict) -> bool:
@@ -325,5 +256,5 @@ class JsonSchemaFactory:
             Draft7Validator.check_schema(schema)
             return True
         except SchemaError as e:
-            print(f"Schema error: {e.message}")
+            logger.error("Schema error: %s", str(e))
             raise

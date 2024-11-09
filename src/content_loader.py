@@ -25,12 +25,12 @@ def load_docx_data(file_path: str) -> str:
         str: The content of the DOCX file as a string.
         
     Exceptions raised:
-        Exception: If there is an error reading the DOCX file
+        ValueError: If there is an error reading the DOCX file
     """
     try:
         doc = Document(file_path)
         if doc is None:
-            raise Exception("Error reading DOCX file")
+            raise ValueError("Error reading DOCX file")
         
         content = []
         for paragraph in doc.paragraphs:
@@ -38,7 +38,7 @@ def load_docx_data(file_path: str) -> str:
         content_str = '\n'.join(content)
         logging.info("Content Str type: %s", type(content_str))
         logging.info("Content Str len: %d", len(content_str))
-        logging.info("Content Str[:1000]: %s", content_str[:1000])
+        logging.info("Content Str[:1000]: [[%s]]", content_str[:1000])
         return content_str
     except Exception as e:
         logging.error("Error reading DOCX file: %s", e)

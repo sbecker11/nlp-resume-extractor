@@ -13,7 +13,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from src.content_loader import load_docx_data
 from src.json_schema_factory import JsonSchemaFactory
-from gpt4all import GPT4All
+# from gpt4all import GPT4All
 
 logging.basicConfig(
     format='%(filename)s: %(message)s',
@@ -54,12 +54,11 @@ def process_resume_text(resume_content, resume_schema) -> Optional[dict]:
 
     # Expected type of response is a dictionary with a 'choices' key containing a list of dictionaries
     response = client.chat.completions.create(
-        model=MODEL,  # Ensure this is a valid model ID string
+        model=MODEL,
         messages=messages,
-        response_format=response_format,
-        temperature = 0.0
+        response_format=response_format
     )
-    extracted_resume_data = response['choices'][0]['message']['content']  # Assuming response is a valid method to get the JSON response
+    extracted_resume_data = response['choices'][0]['message']['content']
     if extracted_resume_data is None:
         logging.error("Error no output from process_resume_text")
         return None
@@ -70,29 +69,42 @@ def process_resume_text(resume_content, resume_schema) -> Optional[dict]:
         logging.error("Error output is not a dictionary")
         return None
 
-    # Calling function will check if the extracted data is valid against the schema
+    # The caller will check if the extracted
+    # data is valid against the schema
     return extracted_resume_data
 
 
 
 if __name__ == "__main__":
-    JSON_SCHEMA_PATH = "src/named-resume-schema.json"
-    LEGITIMATE_DATA_OBJECT_PATH = "src/legitimate-data-object.json"
+    JSON_SCHEMA_PATH = "src/new-resume-schema.json"
+    # TEST_DATA_OBJECT_PATH = "src/test-data-object.json"
 
-    FACTORY = JsonSchemaFactory(JSON_SCHEMA_PATH, LEGITIMATE_DATA_OBJECT_PATH)
+    try:
+        FACTORY = JsonSchemaFactory(JSON_SCHEMA_PATH)
+    except json.JSONDecodeError as e:
+        logging.error("Error: %s", e)
+        sys.exit(1)
+    except ValueError as e:
+        logging.error("Error: %s", e)
+        sys.exit(1)
+    except FileNotFoundError as e:
+        logging.error("Error: %s", e)
+        sys.exit(1)
 
-    NAMED_RESUME_SCHEMA = FACTORY.get_validated_json_schema()
+    RESUME_SCHEMA = FACTORY.get_validated_json_schema()
 
     RESUME_TEXT = load_docx_data("resume.docx")
 
-    extracted_data = process_resume_text(resume_content=RESUME_TEXT, resume_schema=NAMED_RESUME_SCHEMA)
+    extracted_data = process_resume_text(
+        resume_content=RESUME_TEXT,
+        resume_schema=RESUME_SCHEMA)
 
     if extracted_data is None:
         logging.error("Error no extracted_data from process_resume_text")
         sys.exit(1)
 
     resume_object = extracted_data
-    if FACTORY.validate_data_object(resume_object) is False:
+    if FACTORY.validate_instance(resume_object) is False:
         logging.error("Error extracted data does not conform to the resume_schema")
         sys.exit(1)
 
