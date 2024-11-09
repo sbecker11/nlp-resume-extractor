@@ -11,8 +11,12 @@ import sys
 from typing import Optional
 from openai import OpenAI
 from dotenv import load_dotenv
+load_dotenv()
+
+api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=api_key)
+MODEL = "gpt-4o-2024-08-06"
 from src.content_loader import load_docx_data
-from src.json_schema_factory import JsonSchemaFactory
 # from gpt4all import GPT4All
 
 logging.basicConfig(
