@@ -8,29 +8,24 @@ import os
 import json
 import logging
 import sys
+from devtools import debug
 from typing import Optional
 from openai import OpenAI
 from dotenv import load_dotenv
 from src.content_loader import load_docx_data
 from src.json_schema_factory import JsonSchemaFactory, read_json_schema_file
 from src.pydantic_resume import PydanticResume
+from pydantic import ValidationError as PydanticValidationError
+
 
 load_dotenv()
-
-api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=api_key)
-MODEL = "gpt-4o-2024-08-06"
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai_client_model = "gpt-4o-2024-08-06"
 
 logging.basicConfig(
     format='%(filename)s: %(message)s',
     level=logging.INFO
 )
-
-load_dotenv()
-
-api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=api_key)
-MODEL = "gpt-4o-2024-08-06"
 
 def openai_process_resume_text(resume_content, resume_schema) -> Optional[dict]:
     """
@@ -47,9 +42,13 @@ def openai_process_resume_text(resume_content, resume_schema) -> Optional[dict]:
         resume_json: The extracted resume data in the form
         of an object that conforms to the given resume_schema.
     """
+    
     response_format = {
         "type": "json_schema",
-        "json_schema": resume_schema
+        "json_schema": {
+            "name": "resume-schema",
+            "schema": resume_schema
+        }
     }
 
     messages = [
@@ -57,17 +56,19 @@ def openai_process_resume_text(resume_content, resume_schema) -> Optional[dict]:
         { "role": "user", "content": f"Resume Text: \n------\n{resume_content}\n------" }
     ]
 
-    # Expected type of response is a dictionary with a 'choices' key containing a list of dictionaries
-    response = client.chat.completions.create(
-        model=MODEL,
+    response =  openai_client.chat.completions.create(
+        model=openai_client_model,
         messages=messages,
         response_format=response_format
     )
+    
     logging.info("isResponse: %s", response)
+    
+    # Expected resoonse is a non-null dictionary with a 'choices' key containing a list of dictionaries
     if response is None:
         logging.error("Error no response from OpenAI")
         return None
-
+    
     if not hasattr(response, 'choices') or not isinstance(response.choices, list):
         logging.error("Error no choices in response or choices is not a list")
         return None
@@ -80,20 +81,34 @@ def openai_process_resume_text(resume_content, resume_schema) -> Optional[dict]:
         logging.error("Error no message or content in response")
         return None
 
-    extracted_resume_data = response.choices[0].message.content
-    if extracted_resume_data is None:
+    extracted_data = response.choices[0].message.content
+    if extracted_data is None:
+        logging.error("Error no extracted data in response")
+        return None
         logging.error("Error no output from openai_process_resume_text")
         return None
 
-    if "error" in extracted_resume_data:
-        logging.error("Error: %s", extracted_resume_data['error'])
+    if "error" in extracted_data:
+        logging.error("Error: %s", extracted_data['error'])
         return None
 
-    if not isinstance(extracted_resume_data, dict):
-        logging.error("Error output is not a dictionary")
+    extracted_object = None
+    if isinstance(extracted_data, dict):
+        extracted_object = extracted_data
+    elif isinstance(extracted_data, str):
+        try:
+            extracted_object = json.loads(extracted_data)
+        except json.JSONDecodeError as e:
+            logging.error("Error extracted_data is a string that cannot be converted to a dict. error: %s", str(e) )
+            return None 
+    else:
+        logging.error("Error extracted_data is not a dict or string")
         return None
+    
 
-    return extracted_resume_data
+    ## !!! Success !!! 
+    # caller validates the extracted_object against the resume_schema
+    return extracted_object
 
 
 if __name__ == "__main__":
@@ -101,6 +116,7 @@ if __name__ == "__main__":
     resume_schema_path = "src/resume-schema.json"
     # test_data_path = "src/test-data-object.json"
 
+    # validate the resume schema
     try:
         factory = JsonSchemaFactory(resume_schema_path)
     except json.JSONDecodeError as e:
@@ -113,38 +129,48 @@ if __name__ == "__main__":
         logging.error("Error: %s", e)
         sys.exit(1)
 
-    resume_schema = read_json_schema_file(resume_schema_path)
-    # resume_schema = factory.get_validated_json_schema()
+    # get the validated resume schema
+    resume_schema = factory.get_validated_json_schema()
+    
+    # Load the resume content from the DOCX file
     resume_text = load_docx_data(resume_docx_path)
 
-    openai_extracted_data = openai_process_resume_text(
+    ## call openai_process_resume_text to extract the resume data 
+    ## from the resume text using openai_client_model the resume schema
+    openai_extracted_object = openai_process_resume_text(
         resume_content=resume_text,
         resume_schema=resume_schema)
 
-    if openai_extracted_data is None:
-        logging.error("Error openai_extracted_data is null")
+    if openai_extracted_object is None:
+        logging.error("Error openai_extracted_object is null")
         sys.exit(1)
-    if not isinstance(openai_extracted_data, dict):
-        logging.error("Error openai_extracted_data is not a dict")
-        sys.exit(1)
-
-    # validate against the resume schema 
-    if factory.validate_instance(openai_extracted_data) is False:
-        logging.error("Error openai_extracted_data does not conform to the resume_schema")
-        sys.exit(1)
-
-    logging.info("SUCCESS!! openai_extracted_data conforms to the resume_schema!!")
-    openai_resume_object = openai_extracted_data
-    logging.info("openai_resume_object: \n%s", json.dumps(openai_resume_object, indent=2))
- 
-    # validate against the PydanticResume model
-    pydantic_resume_object = PydanticResume(**openai_resume_object)
-    if pydantic_resume_object is None:
-        logging.error("Error pydantic_resume_object is null")
-        sys.exit(1)
-    logging.info("pydantic_resume_object type: %s", type(pydantic_resume_object))
-
-    logging.info("pydantic_resume_object: \n%s", json.dumps(pydantic_resume_object, indent=2))
     
-    logging.info("SUCCESS!! openai_resume_object conforms to the PydanticResume model!!")
-    sys.exit(0)
+    # validate the openai_extracted_pbkect against the resume schema 
+    if factory.validate_instance(openai_extracted_object) is False:
+        logging.error("Error openai_extracted_object does not conform to the resume_schema")
+        sys.exit(1)
+
+    logging.info("SUCCESS!! openai_extracted_object conforms to the resume_schema!!")
+    
+    # rename the openai_extracted_data to openai_resume_object
+    openai_resume_object = openai_extracted_object
+    logging.info("openai_resume_object:")
+    logging.info(json.dumps(openai_resume_object, indent=2))
+ 
+    # validate the openai_resume_object against the PydanticResume model
+    # by testing if a pudandic_resume_object is created without errors
+    try:
+        pydantic_resume_object = PydanticResume(**openai_resume_object)
+        
+        # pydantic models are not json serializable, so using devtools.debug instead
+        logging.info("pydantic_resume_object:")
+        debug(pydantic_resume_object)
+        
+        print("SUCCESS openai_resume_object is valid against the PydanticResume model")
+
+    except PydanticValidationError as e:
+        print("openai_resume_object is invalid against the PydanticResume model.")
+        print(str(e))
+        exit(1)
+        
+print("!!! DONE !!!")
