@@ -1,51 +1,51 @@
 {
     "resume": {
-        "contactInfo": {
-            "first": "Joe",
-            "last": "Jones",
+        "contactInformation": {
+            "firstName": "Joe",
+            "lastName": "Jones",
             "email": "joe@jones.com",
             "phone": "555-555-5555",
-            "street": "123 Main St",
+            "address": "123 Main St",
             "city": "San Francisco",
             "state": "CA",
-            "zipcode": "94105",
+            "zipCode": "94105",
             "country": "USA"
         },
-        "jobs": [
+        "workHistory": [
             {
-                "title": "clerk",
-                "company": "company1",
-                "location": "remote",
+                "workPositionOrTitle": "clerk",
+                "workForCompanyName": "company1",
+                "workLocationOrRemote": "remote",
                 "duration": {
                     "start": "2019-01-01",
                     "end": "2020-01-01"
                 },
-                "tasks": [
+                "workResponsibilitiesAccomplishments": [
                     "accomplishment1",
                     "accomplishment2"
                 ]
             },
             {
-                "title": "manager",
-                "company": "company2",
-                "location": "remote",
+                "workPositionOrTitle": "manager",
+                "workForCompanyName": "company2",
+                "workLocationOrRemote": "remote",
                 "duration": {
                     "start": "2019-01-01",
                     "end": "2020-01-01"
                 },
-                "tasks": [
+                "workResponsibilitiesAccomplishments": [
                     "accomplishment3",
                     "accomplishment4"
                 ]
             }
         ],
-        "education": [
+        "educationHistory": [
             {
                 "institution": "school1",
                 "degree": "BS",
-                "major": "Computer Science",
-                "minor": "Math",
-                "gpa": "3.5",
+                "majors": ["Computer Science"],
+                "minors": ["Math"],
+                "gradePointAverage": "3.5",
                 "duration": {
                     "start": "2015-01-01",
                     "end": "2019-01-01"
@@ -54,9 +54,9 @@
             {
                 "institution": "school2",
                 "degree": "MS",
-                "major": "Data Science",
-                "minor": "Statistics",
-                "gpa": "3.8",
+                "majors": ["Data Science"],
+                "minors": ["Statistics"],
+                "gradePointAverage": "3.8",
                 "duration": {
                     "start": "2019-01-01",
                     "end": "2021-01-01"
