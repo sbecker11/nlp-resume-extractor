@@ -4,6 +4,8 @@ Module for processing, validating, and using any json-schema object
 import json
 import logging
 from typing import Optional
+
+# pip install jsonschema
 from jsonschema import Draft7Validator
 from jsonschema.exceptions import ValidationError, SchemaError
 
@@ -175,6 +177,7 @@ class JsonSchemaFactory:
         if self.test_data_object:
             try:
                 external_validate_data_object(candidate_json_schema, self.test_data_object)
+                print("SUCCESS - json schema passed test against known test data object")
             except ValidationError as e:
                 raise SchemaError(f"Error: json schema failed test against \
                     known test data object: {e.message}") from e

@@ -1,109 +1,219 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "properties": {
-        "contactInformation": {
-            "type": "string"
-        },
-        "positionOrProfessionalTitle": {
-            "type": "string"
-        },
-        "professionalSummary": {
-            "type": "string"
-        },
-        "workExperience": {
-            "type": "array",
-            "items": {
+    "name": "resume-schema",
+    "description": "A JSON schema for a resume",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "contactInformation": {
+                "description": "The person's contact information might include firstName, lastName, email, phone, address, city, xtate, zipCode, country",
                 "type": "object",
                 "properties": {
-                    "companyName": {
+                    "firstName": {
+                        "description": "The person's first name, such as 'John' or 'Jane'",
                         "type": "string"
                     },
-                    "location": {
+                    "lastName": {
+                        "description": "The person's last name, such as 'Doe' or 'Smith'",
                         "type": "string"
                     },
-                    "duration": {
-                        "type": "object",
-                        "properties": {
-                            "start": {
-                                "type": "string"
+                    "email": {
+                        "description": "The person's email address, such as 'job@doe.com'",
+                        "type": "string"
+                    },
+                    "phone": {
+                        "description": "The person's optional phone number, such as '555-123-4567'",
+                        "type": ["string","null"]
+                    },
+                    "address": {
+                        "description": "The person's optional street address, such as '123 Main St.'",
+                        "type": ["string","null"]
+                    },
+                    "city": {
+                        "description": "The person's optional city, such as 'San Francisco'",
+                        "type": ["string","null"]
+                    },
+                    "state": {
+                        "description": "The person's optional state or province, such as 'CA' or 'NY'",
+                        "type": ["string","null"]
+                    },
+                    "zipCode": {
+                        "description": "The person's optional zipCode or postalCode, such as '94105' or '90210'",
+                        "type": ["string","null"]
+                    },
+                    "country": {
+                        "description": "The person's optional country, such as 'USA' or 'Canada'",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "address",
+                    "city",
+                    "country",
+                    "email",
+                    "firstName",
+                    "lastName",
+                    "phone",
+                    "state",
+                    "zipCode"
+                ],
+                "additionalProperties": false
+            },
+            "workHistory": {
+                "description": "The person's work history as a list of workHistoryItems sorted by their workDurations",
+                "type": "array",
+                "items": {
+                    "name": "workHistoryItem",
+                    "description": "a period of work including workPositionOrTitle, workForCompanyName, workLocationOrRemote, workDuration, workResponsibilitiesAccomplishments",
+                    "type": "object",
+                    "properties": {
+                        "workPositionOrTitle": {
+                            "description": "The position or professional title of the person, while working at this compnay, such as 'Software Engineer' or 'Data Scientist'",
+                            "type": "string"
+                        },
+                        "workForCompanyName": {
+                            "description": "The name of the company the person worked for",
+                            "type": "string"
+                        },
+                        "workLocationOrRemote": {
+                            "description": "The location of where the person worked for the company, like 'San Francisco, CA', Or 'Remote' if the person worked from home",
+                            "type": "string"
+                        },
+                        "wprkDuration": {
+                            "description": "The optional start and end dates of the person's' employment at the company, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",    
+                            "type": ["object" , "null"],
+                            "properties": {
+                                "workStart": {
+                                    "description": "The start date of the person's employment at the company",
+                                    "type": "string"
+                                },
+                                "workEnd": {
+                                    "description": "The end date of the person's employment at the company",
+                                    "type": "string"
+                                }
                             },
-                            "end": {
+                            "required": [
+                                "workStart",
+                                "workEnd"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "workResponsibilitiesAccomplishments": {
+                            "description": "A list of sentences describing the person's responsibilities or noteable accomplishments during their time at the company",
+                            "type": "array",
+                            "items": {
+                                "name":"workResponsibilitiesAccomplishmentsItem",
+                                "description": "A sentence describing one of the person's responsibilities or noteable accomplishments achieved during their time at the company",
                                 "type": "string"
                             }
-                        },
-                        "required": [
-                            "end",
-                            "start"
-                        ]
-                    },
-                    "positionOrTitle": {
-                        "type": "string"
-                    },
-                    "responsibilities": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
                         }
-                    }
-                },
-                "required": [
-                    "companyName",
-                    "duration",
-                    "location",
-                    "positionOrTitle",
-                    "responsibilities"
-                ]
-            }
-        },
-        "education": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "institution": {
-                        "type": "string"
                     },
-                    "degree": {
-                        "type": "string"
-                    }
+                    "required": [
+                        "workCompanyName",
+                        "workDuration",
+                        "workLocationOrRemote",
+                        "workPositionOrTitle",
+                        "workResponsibilitiesAccomplishments"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "educationHistory": {
+                "description": "A list of the person's education history, including institutions, degrees and majors",
+                "type": "array",
+                "items": {
+                    "name": "educationHistoryItem",
+                    "description": "An item in a person's education history, including institution, degree and major",
+                    "type": "object",
+                    "properties": {
+                        "institution": {
+                            "description": "The name of the institution the person attended, such as 'Stanford University' or 'UC Berkeley'",
+                            "type": "string"
+                        },
+                        "degree": {
+                            "description": "The degree the person earned at the institution, such as ('BS' or 'Bachelor of Science'), or ('MFA' or 'Master of Fine Arts')",
+                            "type": "string"
+                        },
+                        "majors": {
+                            "description": "An optional comma-separated list of majors of the person's degree, such as 'Computer Science' or 'Art History'",
+                            "type": "string"
+                        },
+                        "minors": {
+                            "description": "An optional comma-separated list of minors of the person's degree, such as 'Computer Science' or 'Art History'",
+                            "type": ["string","null"]
+                        },
+                        "gradePointAverage": {
+                            "description": "The optional grade point average (GPA) the person earned while attending the institution, such as '3.5' or 'B+'",
+                            "type": ["string","null"]
+                        },
+                        "duration": {
+                            "description": "The optional start and end dates of the person's attendance at the institution, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",
+                            "type": ["object", "null"],
+                            "properties": {
+                                "start": {
+                                    "description": "The optional start date of the person's attendance at the institution",
+                                    "type": ["string", "null"]
+                                },
+                                "end": {
+                                    "description": "The optional end date of the person's attendance at the institution",
+                                    "type": ["string","null"]
+                                }
+                            },
+                            "required": [
+                                "end",
+                                "start"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "duration",
+                        "gradePointAverage",
+                        "major",
+                        "degree",
+                        "institution"
+                    ],
+                    "additionalProperties": false
                 },
                 "required": [
-                    "degree",
-                    "institution"
-                ]
+                    "educationHidtoryItem"
+                ],
+                "additionalProperties": false
+            },
+            "skills": {
+                "description": "An optional comma-separated list of the person's skills, such as 'Python', 'Machine Learning', 'React', 'Data Analysis'",
+                "type": ["string", "null"]
+            },
+            "certifications": {
+                "description": "An optional comma-separated list of the person's certifications, such as 'AWS Certified Solutions Architect', 'Google Analytics Certified'",
+                "type": ["string", "null"]
+            },
+            "publications": {
+                "description": "An optional list of the person's publications, such as books, articles, or research papers",
+                "type": ["string", "null"]
+            },
+            "patents": {
+                "description": "An optional list of the person's patents or inventions",
+                "type": ["string", "null"]
+            },
+            "websites": {
+                "type": ["array","null"],
+                "items": {
+                    "description": "An optional list of the person's websites or online profiles, such as LinkedIn, GitHub, or a URL to their personal website",
+                    "type": "string"
+                }
             }
         },
-        "skills": {
-            "type": "string"
-        },
-        "certifications": {
-            "type": "string"
-        },
-        "publications": {
-            "type": "string"
-        },
-        "patents": {
-            "type": "string"
-        },
-        "websites": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        }
-    },
-    "required": [
-        "certifications",
-        "contactInformation",
-        "education",
-        "patents",
-        "positionOrProfessionalTitle",
-        "professionalSummary",
-        "publications",
-        "skills",
-        "websites",
-        "workExperience"
-    ],
-    "additionalProperties": false
+        "required": [
+            "certifications",
+            "contactInformation",
+            "educationHistory",
+            "patents",
+            "positionOrProfessionalTitle",
+            "professionalSummary",
+            "publications",
+            "skills",
+            "websites",
+            "workHistory"
+        ],
+        "additionalProperties": false
+    }
 }

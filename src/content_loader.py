@@ -5,7 +5,11 @@ PDF file formats.
 """
 
 import logging
+
+# pip install python-docx
 from docx import Document
+
+# pip install pdfminer.six
 from pdfminer.high_level import extract_text
 
 logging.basicConfig(
@@ -38,7 +42,7 @@ def load_docx_data(file_path: str) -> str:
         content_str = '\n'.join(content)
         logging.info("Content Str type: %s", type(content_str))
         logging.info("Content Str len: %d", len(content_str))
-        logging.info("Content Str[:1000]: [[%s]]", content_str[:1000])
+        logging.info("Content Str[:1000]:\n[[%s]]\n", content_str[:1000])
         return content_str
     except Exception as e:
         logging.error("Error reading DOCX file: %s", e)
