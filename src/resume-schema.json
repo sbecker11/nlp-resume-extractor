@@ -17,11 +17,13 @@
                 },
                 "email": {
                     "description": "The person's email address, such as 'job@doe.com'",
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,7})$"
                 },
                 "phone": {
                     "description": "The person's optional phone number, such as '555-123-4567'",
-                    "type": ["string", "null"]
+                    "type": ["string", "null"],
+                    "pattern": "^\\+?\\d{1,3}?[- .]?\\(?\\d{1,3}?\\)?[- .]?\\d{1,4}[- .]?\\d{1,4}[- .]?\\d{1,4}$"
                 },
                 "address": {
                     "description": "The person's optional street address, such as '123 Main St.'",
@@ -65,16 +67,19 @@
                         "type": "string"
                     },
                     "duration": {
-                        "description": "The optional start and end dates of the person's employment at the company, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",
+                        "description": "The optional start and end dates of the person's employment at the company",
                         "type": ["object", "null"],
+                        "default": null,
                         "properties": {
                             "start": {
                                 "description": "The start date of the person's employment at the company",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$"
                             },
                             "end": {
                                 "description": "The end date of the person's employment at the company",
-                                "type": "string"
+                                "type": "string",
+                                "pattern": "^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$"
                             }
                         },
                         "required": ["start", "end"],
@@ -125,19 +130,23 @@
                         "type": ["string", "null"]
                     },
                     "duration": {
-                        "description": "The optional start and end dates of the person's attendance at the institution, in the format 'YYYY-MM-DD' or 'YYYY-MM' or 'YYYY'",
+                        "description": "The optional start and end dates of the person's employment at the company",
                         "type": ["object", "null"],
+                        "default": null,
                         "properties": {
                             "start": {
-                                "description": "The optional start date of the person's attendance at the institution",
-                                "type": ["string", "null"]
+                                "description": "The start date of the person's employment at the company",
+                                "type": "string",
+                                "pattern": "^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$"
                             },
                             "end": {
-                                "description": "The optional end date of the person's attendance at the institution",
-                                "type": ["string", "null"]
+                                "description": "The end date of the person's employment at the company",
+                                "type": "string",
+                                "pattern": "^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$"
                             }
                         },
-                        "required": ["start", "end"]
+                        "required": ["start", "end"],
+                        "additionalProperties": false
                     }
                 },
                 "required": ["institution", "degree", "duration"],

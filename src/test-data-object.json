@@ -1,73 +1,68 @@
 {
-    "resume": {
-        "contactInformation": {
-            "firstName": "Joe",
-            "lastName": "Jones",
-            "email": "joe@jones.com",
-            "phone": "555-555-5555",
-            "address": "123 Main St",
-            "city": "San Francisco",
-            "state": "CA",
-            "zipCode": "94105",
-            "country": "USA"
+    "contactInformation": {
+        "firstName": "Joe",
+        "lastName": "Jones",
+        "email": "joe@jones.com",
+        "phone": "555-555-5555",
+        "address": "123 Main St",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94105",
+        "country": "USA"
+    },
+    "workHistory": [
+        {
+            "workPositionOrTitle": "clerk",
+            "workForCompanyName": "company1",
+            "workLocationOrRemote": "remote",
+            "duration": {
+                "start": "2019-01-01",
+                "end": "2020-01-01"
+            },
+            "workResponsibilitiesAccomplishments": [
+                "accomplishment1",
+                "accomplishment2"
+            ]
         },
-        "workHistory": [
-            {
-                "workPositionOrTitle": "clerk",
-                "workForCompanyName": "company1",
-                "workLocationOrRemote": "remote",
-                "duration": {
-                    "start": "2019-01-01",
-                    "end": "2020-01-01"
-                },
-                "workResponsibilitiesAccomplishments": [
-                    "accomplishment1",
-                    "accomplishment2"
-                ]
+        {
+            "workPositionOrTitle": "manager",
+            "workForCompanyName": "company2",
+            "workLocationOrRemote": "remote",
+            "duration": {
+                "start": "2019-01-01",
+                "end": "2020-01-01"
             },
-            {
-                "workPositionOrTitle": "manager",
-                "workForCompanyName": "company2",
-                "workLocationOrRemote": "remote",
-                "duration": {
-                    "start": "2019-01-01",
-                    "end": "2020-01-01"
-                },
-                "workResponsibilitiesAccomplishments": [
-                    "accomplishment3",
-                    "accomplishment4"
-                ]
+            "workResponsibilitiesAccomplishments": [
+                "accomplishment3",
+                "accomplishment4"
+            ]
+        }
+    ],
+    "educationHistory": [
+        {
+            "institution": "school1",
+            "degree": "BS",
+            "majors": ["Computer Science"],
+            "minors": ["Math"],
+            "gradePointAverage": "3.5",
+            "duration": {
+                "start": "2015-01-01",
+                "end": "2019-01-01"
             }
-        ],
-        "educationHistory": [
-            {
-                "institution": "school1",
-                "degree": "BS",
-                "majors": ["Computer Science"],
-                "minors": ["Math"],
-                "gradePointAverage": "3.5",
-                "duration": {
-                    "start": "2015-01-01",
-                    "end": "2019-01-01"
-                }
-            },
-            {
-                "institution": "school2",
-                "degree": "MS",
-                "majors": ["Data Science"],
-                "minors": ["Statistics"],
-                "gradePointAverage": "3.8",
-                "duration": {
-                    "start": "2019-01-01",
-                    "end": "2021-01-01"
-                }
+        },
+        {
+            "institution": "school2",
+            "degree": "MS",
+            "majors": ["Data Science"],
+            "minors": ["Statistics"],
+            "gradePointAverage": "3.8",
+            "duration": {
+                "start": "2019-01-01",
+                "end": "2021-01-01"
             }
-        ],
-        "certifications": ["cert1", "cert2", "cert3"],
-        "websites": [
-            "site1",
-            "site2"
-        ],
-        "skills": ["skill1", "skill2", "skill3"]
-    }
+        }
+    ],
+    "certifications": ["cert1", "cert2", "cert3"],
+    "websites": ["site1","site2"],
+    "skills": ["skill1", "skill2", "skill3"]
 }

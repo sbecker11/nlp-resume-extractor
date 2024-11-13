@@ -2,6 +2,9 @@
 Module for processing, validating, and using any json-schema object
 """
 import json
+import sys
+import os
+from dotenv import load_dotenv
 import logging
 from typing import Optional
 
@@ -261,3 +264,29 @@ class JsonSchemaFactory:
         except SchemaError as e:
             logger.error("Schema error: %s", str(e))
             raise
+
+if __name__ == "__main__":
+    load_dotenv()
+
+    resume_schema_path = os.getenv("RESUME_SCHEMA_PATH")
+    test_data_object_path = os.getenv("TEST_DATA_OBJECT_PATH")
+
+    # validate the resume schema
+    try:
+        factory = JsonSchemaFactory(resume_schema_path, test_data_object_path)
+    except json.JSONDecodeError as e:
+        logging.error("Error: %s", e)
+        sys.exit(1)
+    except ValueError as e:
+        logging.error("Error: %s", e)
+        sys.exit(1)
+    except FileNotFoundError as e:
+        logging.error("Error: %s", e)
+        sys.exit(1)
+
+    # get the validated resume schema
+    resume_schema = factory.get_validated_json_schema()
+    
+    logger.info("SUCCESS!! resume_schema is valid against Draft7Validator!!")
+    logger.info("SUCCESS!! resume_schema is valid against test_data_object!!")
+    
