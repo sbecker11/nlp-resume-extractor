@@ -1,0 +1,78 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ResumeContactInformationSchema",
+    "type": "object",
+    "properties": {
+        "contactInformation": {
+            "description": "The candidate's contact information might include firstName, lastName, email, phone, address, city, state, zipCode, country",
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "description": "The candidate's first name, such as 'John' or 'Jane'",
+                    "type": "string"
+                },
+                "lastName": {
+                    "description": "The candidate's last name, such as 'Doe' or 'Smith'",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "The candidate's email address, such as 'job@doe.com'",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                },
+                "phone": {
+                    "description": "The candidate's optional phone number, such as '555-123-4567'",
+                    "type": ["string", "null"],
+                    "pattern": "^\\+?[1-9]\\d{0,2}[- .]?\\(?\\d{1,4}\\)?[- .]?\\d{1,4}[- .]?\\d{1,9}$"
+                },
+                "address": {
+                    "description": "The candidate's optional street address, such as '123 Main St.'",
+                    "type": ["string", "null"]
+                },
+                "city": {
+                    "description": "The candidate's optional city, such as 'San Francisco'",
+                    "type": ["string", "null"]
+                },
+                "state": {
+                    "description": "The candidate's optional state or province, such as 'CA' or 'NY'",
+                    "type": ["string", "null"]
+                },
+                "zipCode": {
+                    "description": "The candidate's optional zipCode or postalCode, such as '94105' or '90210'",
+                    "type": ["string", "null"]
+                },
+                "country": {
+                    "description": "The candidate's optional country, such as 'USA' or 'Canada'",
+                    "type": "string"
+                }
+            },
+            "required": ["firstName", "lastName", "email"]
+        },
+        "introduction" : {
+            "description": "optional chunk of text that serves as the candidate's introduction",
+            "type": ["string", "null"]
+        },
+        "projects": {
+            "description": "optional chunk of text that lists the candidates current or notable projects",
+            "type": ["string", "null"]
+        },
+        "employmentHistory": {
+            "description": "optional chunk of text that lists the candidates's history of jobs, each having a company name, candidate's title, duration, and notable tasks",
+            "type": ["string", "null"]
+        },
+        "educationHistory": {
+            "description": "optional chunk of text that lists the candidate's history of academic degrees, each having a university or college name, a subject such as computer Science, majors, minors, and duration",
+            "type": ["string", "null"]
+        },
+        "publications": {
+            "description": "optional chunk of text that lists the candidate's publications, websites, blogs, credentials, certifications, licences, patents, etc.",
+            "type": ["string", "null"]
+        },
+        "skills": {
+            "description": "optional chunk of text that summarizes the candidate's hard and soft skills",
+            "type": ["string", "null"]
+        }
+    },
+    "required": ["contactInformation"],
+    "additionalProperties": false
+}

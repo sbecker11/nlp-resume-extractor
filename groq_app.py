@@ -8,6 +8,8 @@ import os
 import json
 import logging
 import sys
+import tiktoken
+
 from typing import Optional
 from devtools import debug
 from dotenv import load_dotenv
@@ -24,24 +26,21 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-def groq_process_resume_text(resume_content :str, resume_schema_str: str) -> Optional[dict]:
-    """
-    Extracts a JSON object from a resume text using Groq's latest LLM.
 
-    Args:
-        resume_content (str): _description_
-        resume_schema_str (str): _description_
+def num_tokens_from_string(string: str, encoding_name: str) -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
 
-    Raises:
-        ValueError: _description_
+def groq_process_resume_text_1(
+    resume_content :str, 
+    resume_schema_str: str) -> Optional[dict]:
 
-    Returns:
-        Optional[dict]: _description_
-    """
     messages=[
         {
             "role": "system",
-            "content": "You are a recipe database that outputs recipes in JSON.\n"
+            "content": "You are a recipe database that outputs resumes in JSON.\n"
             f" The JSON object must use the schema: {resume_schema_str}"
         },
         {
@@ -55,42 +54,74 @@ def groq_process_resume_text(resume_content :str, resume_schema_str: str) -> Opt
         "schema": resume_schema_str,
     }
 
-    # Ensure the total length is within the model's sequence length limit
-    max_tokens = 8192
-    total_length = len(resume_content) + len(resume_schema_str)
-    if total_length > max_tokens:
-        raise ValueError("The combined length of resume content \
-            and schema: %d exceeds the model's sequence length \
-                limit: %d.", total_length, max_tokens)
-
-
     groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
     groq_client_model = "llama3-groq-8b-8192-tool-use-preview"
 
-    completion = groq_client.chat.completions.create(
+    max_putput_tokens = 8192 - len(resume_schema_str)
+                                     
+    response = groq_client.chat.completions.create(
         model=groq_client_model,
         messages=messages,
         temperature=0,
-        max_tokens=max_tokens,
-        stream=False,
-        response_format=response_format,
-        stop=None,
+        max_tokens=max_putput_tokens,
+        response_format=response_format
     )
 
-    json_str = ""
-    for chunk in completion:
-        json_str += chunk.choices[0].delta.content
+    # Extracting and printing the JSON response
+    try:
+        json_response = json.loads(response.choices[0].message.content)
+        return json_response
+    except Exception as e:
+        print(f"Failed to parse JSON response: {e}")
+        print(response.choices[0].message.content)
+        return None
 
-    extracted_object = json.loads(json_str)
+
+def groq_process_resume_text_2(
+    resume_text: str, 
+    resume_schema_str: str) -> Optional[dict]:
+    messages = [
+        {
+            "role": "system",
+            "content": f"You are a helper designed to provide structured JSON responses from this resume text: {resume_text}."
+        },
+        {
+            "role": "user",
+            "content": "The JSON response should be formatted as defined in the given json schema."
+        }   
+    ]
+    
+    response_format = {
+        "type": "json_object",
+        "schema": resume_schema_str
+    }
+    
+    model = "llama3-groq-8b-8192-tool-use-preview"
+    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=0,
+        max_tokens=8192,
+        response_format=response_format
+    )
+    extracted_object = None
+    try: 
+        extracted_json_str = response.choices[0].message.content
+        extracted_object = json.loads(extracted_json_str)
+    except KeyError as e:
+        print(e)
     return extracted_object
+
 
 
 if __name__ == "__main__":
 
     resume_docx_path = os.getenv("RESUME_DOCX_PATH")
-    resume_schema_path = os.getenv("RESUME_SCHEMA_PATH")
-    test_data_object_path = os.getenv("TEST_DATA_OBJECT_PATH")
-
+    resume_schema_path = os.getenv("RESUME_CONTACT_INFOROMATION_SCHEMA_PATH")
+    # test_data_object_path = os.getenv("TEST_DATA_OBJECT_PATH")
+    test_data_object_path = None
+    
     # validate the resume schema
     if not resume_schema_path:
         logging.error("Error: RESUME_SCHEMA_PATH is not set")
@@ -116,29 +147,46 @@ if __name__ == "__main__":
     resume_schema_str = json.dumps(resume_schema, indent=2)
 
     # Load the resume content from the DOCX file
+    if not resume_docx_path:
+        logging.error("Error: RESUME_DOCX_PATH is not set")
+        sys.exit(1)
     resume_text = load_docx_data(resume_docx_path)
 
     ## call groq_process_resume_text to extract the resume data
     ## from the resume text using groq_client_model the resume schema
-    groq_extracted_object = groq_process_resume_text(
-        resume_content=resume_text,
+    groq_extracted_object = groq_process_resume_text_2(
+        resume_text=resume_text,
         resume_schema_str=resume_schema_str)
 
     if groq_extracted_object is None:
         logging.error("Error groq_extracted_object is null")
         sys.exit(1)
-
-    # validate the groq_extracted_object against the resume schema
-    if factory.validate_instance(groq_extracted_object) is False:
-        logging.error("Error groq_extracted_object does not conform to the resume_schema")
-        sys.exit(1)
-
-    logging.info("SUCCESS!! groq_extracted_object conforms to the resume_schema!!")
-
-    # rename the groq_extracted_data to groq_resume_object
-    groq_resume_object = groq_extracted_object
-    logging.info("groq_resume_object:")
-    logging.info(json.dumps(groq_resume_object, indent=2))
+        
+    mainSchemaTitle = '"title": "Resume"'
+    sectionSchemas = [
+        {
+            "title": "ResumeContactInformationSchema",
+            "file": "resume_contact_information_schema.json"
+        }
+    ]
+    
+    if "ResumeContactInformationSchema" in resume_schema_str:
+        logging.info("validating groq_extracted_object against the current resume schema")
+    
+    keep_validating = True
+    if keep_validating:
+        if factory.validate_instance(groq_extracted_object) is False:
+            logging.error("Error: groq_extracted_object does not conform to the resume_schema")
+            keep_validating = False
+        else:
+            logging.info("SUCCESS!! groq_extracted_object conforms to the resume_schema!!")
+    
+    
+    if keep_validating:
+        # rename the groq_extracted_data to groq_resume_object
+        groq_resume_object = groq_extracted_object
+        logging.info("groq_resume_object:")
+        logging.info(json.dumps(groq_resume_object, indent=2))
 
     # validate the groq_resume_object against the PydanticResume model
     # by testing if a pudandic_resume_object is created without errors
