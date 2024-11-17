@@ -10,7 +10,7 @@
         "zipCode": "94105",
         "country": "USA"
     },
-    "workHistory": [
+    "employmentHistory": [
         {
             "workPositionOrTitle": "clerk",
             "workForCompanyName": "company1",
@@ -62,7 +62,10 @@
             }
         }
     ],
-    "certifications": ["cert1", "cert2", "cert3"],
-    "websites": ["site1","site2"],
+    "extraLists": {
+        "publications": ["pub1", "pub2", "pub3"],
+        "certifications": ["cert1", "cert2", "cert3"],
+        "websites": ["site1","site2"]
+    },
     "skills": ["skill1", "skill2", "skill3"]
 }

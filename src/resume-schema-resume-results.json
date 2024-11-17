@@ -1,0 +1,29 @@
+{
+  "name": "Shawn Becker",
+  "title": "Senior Data Engineer",
+  "email": "sbecker@alum.mit.edu",
+  "phone": "(857) 891-0896",
+  "summary": "As a senior data engineer with growing machine learning expertise, I aim to apply my extensive data management skills to the rising field of ML and MLOps.",
+  "experience": [
+    {
+      "company": "Fannie Mae / Risk Works Analysis Data Lake",
+      "position": "Senior Data Engineer",
+      "dates": "Mar 2024 \u2013 Jun 2024",
+      "responsibilities": [
+        "Documented processes to build, test, and deploy data pipeline components for in-house ETL framework",
+        "Extensive work with SQL, AWS Redshift, Glue, S3, IAM, Lambda, REST, Postman, SNS, and dbt",
+        "Utilized Agile practices with Jira"
+      ]
+    },
+    {
+      "company": "The Cigna Group / Data Cybersecurity",
+      "position": "Senior Data Engineer",
+      "dates": "Jun 2023 - Dec 2023",
+      "responsibilities": [
+        "Modernized apps via Jenkins CI/CD pipeline upgrade",
+        "Integrated SetupTools, Artifactory/PyPI, SonarQube, and Xray",
+        "Ensured privacy and encryption standards for user data"
+      ]
+    }
+  ]
+}

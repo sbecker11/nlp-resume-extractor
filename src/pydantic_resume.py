@@ -20,7 +20,7 @@ class ContactInformation(BaseModel):
     country: str
 
 
-class WorkHistoryItem(BaseModel):
+class employmentHistoryItem(BaseModel):
     workPositionOrTitle: str
     workForCompanyName: str
     workLocationOrRemote: str
@@ -36,17 +36,18 @@ class EducationHistoryItem(BaseModel):
     gradePointAverage: Optional[str] = None
     duration: Optional[Duration] = None
 
+class ExtraLists(BaseModel):
+    publications: Optional[List[str]] = None
+    certifications: Optional[List[str]] = None
+    patents: Optional[str] = None
+    websites: Optional[Duration] = None
 
 class PydanticResume(BaseModel):
     contactInformation: ContactInformation
-    workHistory: List[WorkHistoryItem]
+    employmentHistory: List[employmentHistoryItem]
     educationHistory: List[EducationHistoryItem]
     skills: Optional[List[str]] = None
-    certifications: Optional[List[str]] = None
-    publications: Optional[List[str]] = None
-    patents: Optional[List[str]] = None
-    websites: Optional[List[str]] = None
-
+    extraLists: Optional[ExtraLists] = None
 
 if __name__ == "__main__":
 

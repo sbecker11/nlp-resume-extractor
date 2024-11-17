@@ -19,7 +19,7 @@ class ContactInformation(BaseModel):
     country: str
 
 
-class WorkHistoryItem(BaseModel):
+class employmentHistoryItem(BaseModel):
     workPositionOrTitle: str
     workForCompanyName: str
     workLocationOrRemote: str
@@ -38,7 +38,7 @@ class EducationHistoryItem(BaseModel):
 
 class Resume(BaseModel):
     contactInformation: ContactInformation
-    workHistory: List[WorkHistoryItem]
+    employmentHistory: List[employmentHistoryItem]
     educationHistory: List[EducationHistoryItem]
     skills: Optional[List[str]] = None
     certifications: Optional[List[str]] = None

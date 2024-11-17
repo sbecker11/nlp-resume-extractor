@@ -6,52 +6,52 @@
     "type": "object",
     "properties": {
       "contactInformation": {
-        "description": "The person's contact information",
+        "description": "The candidate's contact information",
         "type": "object",
         "properties": {
           "firstName": {
-            "description": "The person's first name",
+            "description": "The candidate's first name",
             "type": "string"
           },
           "lastName": {
-            "description": "The person's last name",
+            "description": "The candidate's last name",
             "type": "string"
           },
           "email": {
-            "description": "The person's email address",
+            "description": "The candidate's email address",
             "type": "string",
             "format": "email"
           },
           "phone": {
-            "description": "Optional, the person's phone number",
+            "description": "Optional, the candidate's phone number",
             "type": ["string", "null"]
           },
           "address": {
-            "description": "Optional, the person's street address",
+            "description": "Optional, the candidate's street address",
             "type": ["string", "null"]
           },
           "city": {
-            "description": "Optional, the person's city",
+            "description": "Optional, the candidate's city",
             "type": ["string", "null"]
           },
           "state": {
-            "description": "Optional, the person's state or province",
+            "description": "Optional, the candidate's state or province",
             "type": ["string", "null"]
           },
           "zipcode": {
-            "description": "Optional, the person's postal code",
+            "description": "Optional, the candidate's postal code",
             "type": ["string", "null"]
           },
           "country": {
-            "description": "Optional, the person's country, such as 'United States'",
+            "description": "Optional, the candidate's country, such as 'United States'",
             "type": ["string","null"]
           }
         },
         "required": ["firstName", "lastName", "email", "phone", "address", "city", "state", "zipcode", "country"],
         "additionalProperties": false
       },
-      "workHistory": {
-        "description": "The person's work history",
+      "employmentHistory": {
+        "description": "The candidate's work history",
         "type": "array",
         "items": {
           "type": "object",
@@ -97,7 +97,7 @@
         }
       },
       "educationHistory": {
-        "description": "Educational background of the person",
+        "description": "Educational background of the candidate",
         "type": "array",
         "items": {
           "type": "object",
@@ -167,6 +167,6 @@
         }
       }
     },
-    "required": ["contactInformation", "workHistory", "educationHistory","skills","certifications","publications","patents","websites"],
+    "required": ["contactInformation", "employmentHistory", "educationHistory","skills","certifications","publications","patents","websites"],
     "additionalProperties": false
   }

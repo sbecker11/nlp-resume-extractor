@@ -7,16 +7,16 @@ using Groq's latest LLM
 import os
 import json
 import logging
-import sys
 import tiktoken
 
 from typing import Optional
 from devtools import debug
 from dotenv import load_dotenv
+import src.json_schema as json_schema
+
 from pydantic import ValidationError as PydanticValidationError
 from groq import Groq
 from src.content_loader import load_docx_data
-from src.json_schema_factory import JsonSchemaFactory
 from src.pydantic_resume import PydanticResume
 
 load_dotenv()
@@ -33,51 +33,7 @@ def num_tokens_from_string(string: str, encoding_name: str) -> int:
     num_tokens = len(encoding.encode(string))
     return num_tokens
 
-def groq_process_resume_text_1(
-    resume_content :str, 
-    resume_schema_str: str) -> Optional[dict]:
-
-    messages=[
-        {
-            "role": "system",
-            "content": "You are a recipe database that outputs resumes in JSON.\n"
-            f" The JSON object must use the schema: {resume_schema_str}"
-        },
-        {
-            "role": "user",
-            "content": f"Resume Text: \\n------\\n{resume_content}\\n------"
-        }
-    ]
-
-    response_format = {
-        "type": "json_object",
-        "schema": resume_schema_str,
-    }
-
-    groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    groq_client_model = "llama3-groq-8b-8192-tool-use-preview"
-
-    max_putput_tokens = 8192 - len(resume_schema_str)
-                                     
-    response = groq_client.chat.completions.create(
-        model=groq_client_model,
-        messages=messages,
-        temperature=0,
-        max_tokens=max_putput_tokens,
-        response_format=response_format
-    )
-
-    # Extracting and printing the JSON response
-    try:
-        json_response = json.loads(response.choices[0].message.content)
-        return json_response
-    except Exception as e:
-        print(f"Failed to parse JSON response: {e}")
-        print(response.choices[0].message.content)
-        return None
-
-
-def groq_process_resume_text_2(
+def groq_process_resume_text(
     resume_text: str, 
     resume_schema_str: str) -> Optional[dict]:
     messages = [
@@ -113,95 +69,181 @@ def groq_process_resume_text_2(
         print(e)
     return extracted_object
 
+def test_schema_def(schema_def):
+    """
+    given a schema_def object, 
+        tests the resume_schema with resume_text
+        and attempts to extract a resume object 
+        usng the groq_process_resume_text function.
+        if successful, saves the extracted object 
+        to the results_path and returns the 
+        extracted object, otherwise None 
 
+    Args:
+        schema_def (pbkect): with the following fields:
+        "schema_path" required path to a schema_file
+        "results_path":  required path to save the extracted object
+        "resume_text_path": required path to the resume text
+        "data_object_path": optionl path to a data object file
 
-if __name__ == "__main__":
-
-    resume_docx_path = os.getenv("RESUME_DOCX_PATH")
-    resume_schema_path = os.getenv("RESUME_CONTACT_INFOROMATION_SCHEMA_PATH")
-    # test_data_object_path = os.getenv("TEST_DATA_OBJECT_PATH")
-    test_data_object_path = None
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    # attempt to load the resume text
+    resume_text = None
+    if schema_def['resume_text_path']:
+        resume_text = load_docx_data(schema_def['resume_text_path'])
+        if resume_text is None:
+            logging.error("Error: resume_text is None")
+            return None
+    else:
+        logging.error("Error: resume_text_path is not set")
+        return None
     
-    # validate the resume schema
-    if not resume_schema_path:
-        logging.error("Error: RESUME_SCHEMA_PATH is not set")
-        sys.exit(1)
-
-    try:
-        factory = JsonSchemaFactory(
-            resume_schema_path, 
-            test_data_object_path)
-        
-    except json.JSONDecodeError as e:
-        logging.error("Error: %s", e)
-        sys.exit(1)
-    except ValueError as e:
-        logging.error("Error: %s", e)
-        sys.exit(1)
-    except FileNotFoundError as e:
-        logging.error("Error: %s", e)
-        sys.exit(1)
-
-    # get the validated resume schema
-    resume_schema = factory.get_validated_json_schema()
-    resume_schema_str = json.dumps(resume_schema, indent=2)
-
-    # Load the resume content from the DOCX file
-    if not resume_docx_path:
-        logging.error("Error: RESUME_DOCX_PATH is not set")
-        sys.exit(1)
-    resume_text = load_docx_data(resume_docx_path)
-
-    ## call groq_process_resume_text to extract the resume data
-    ## from the resume text using groq_client_model the resume schema
-    groq_extracted_object = groq_process_resume_text_2(
+    # use teh schema_def to create a JsonSchemaFactory
+    # and retrieve the validated resume_schema
+    resume_schema_path = schema_def['schema_path']
+    resume_schema_object = json_schema.read_json_schema_file(resume_schema_path)
+    resume_schema_str = json.dumps(resume_schema_object, indent=2)
+    
+    known_data_object = None
+    optional_data_object_path = schema_def['data_object_path'] if 'data_object_path' in schema_def else None
+    if optional_data_object_path:
+        known_data_object = json_schema.read_json_file(optional_data_object_path)
+        json_schema.validate_json_schema_object(resume_schema_object, known_data_object)
+    
+    extracted_object = groq_process_resume_text(
         resume_text=resume_text,
         resume_schema_str=resume_schema_str)
+    
+    if extracted_object is None:
+        logging.error("Error: extracted_object is null")
+        return None
+    else:
+        results_path = schema_def['results_path']
+        logging.info("saving extracted_object to %s", results_path)
+        with open(results_path, "w") as f:
+            json.dump(extracted_object, f, indent=2)
+        return extracted_object
 
-    if groq_extracted_object is None:
-        logging.error("Error groq_extracted_object is null")
-        sys.exit(1)
-        
-    mainSchemaTitle = '"title": "Resume"'
-    sectionSchemas = [
-        {
-            "title": "ResumeContactInformationSchema",
-            "file": "resume_contact_information_schema.json"
-        }
-    ]
-    
-    if "ResumeContactInformationSchema" in resume_schema_str:
-        logging.info("validating groq_extracted_object against the current resume schema")
-    
-    keep_validating = True
-    if keep_validating:
-        if factory.validate_instance(groq_extracted_object) is False:
-            logging.error("Error: groq_extracted_object does not conform to the resume_schema")
-            keep_validating = False
-        else:
-            logging.info("SUCCESS!! groq_extracted_object conforms to the resume_schema!!")
-    
-    
-    if keep_validating:
-        # rename the groq_extracted_data to groq_resume_object
-        groq_resume_object = groq_extracted_object
-        logging.info("groq_resume_object:")
-        logging.info(json.dumps(groq_resume_object, indent=2))
+def test_pydantic_resume( groc_resume_object) -> bool:
+    """
+    Test to see if the given groc_resume_object
+    can be used to crate a pydantic_resume_object.
+    Returns true if successful, false otherwise.
 
-    # validate the groq_resume_object against the PydanticResume model
-    # by testing if a pudandic_resume_object is created without errors
+    Args:
+        groc_resume_object (object): object extracted from resume text_
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
     try:
-        pydantic_resume_object = PydanticResume(**groq_resume_object)
+        pydantic_json_schema = PydanticResume.model_json_schema()
+        print("Pydantic JSON schema:")
+        print(json.dumps(pydantic_json_schema, indent=2))
+        
+        # if this works, the groq_resume_object is valid
+        # againt the pydantic_resume model
+        pydantic_resume_object = PydanticResume(**groc_resume_object)
 
         # pydantic models are not json serializable, so using devtools.debug instead
         logging.info("pydantic_resume_object:")
         debug(pydantic_resume_object)
 
         print("SUCCESS groq_resume_object is valid against the PydanticResume model")
+        return True
 
     except PydanticValidationError as e:
         print("groq_resume_object is invalid against the PydanticResume model.")
         print(str(e))
-        exit(1)
+        return False
+
+def test_resume_master_schema():
+    """ 
+    Test the master resume schema against 
+    a known data object
+    """
+    resumeMasterSchema_def = {
+        "title": "ResumeSchema",
+        "schema_path": "./src/resume-schema.json",
+        "results_path": "./src/resume-schema-resume-results.json",
+        "resume_text_path": os.getenv("RESUME_DOCX_PATH"),
+        "data_object_path": os.getenv("TEST_DATA_OBJECT_PATH")
+    }
+    master_groq_extracted_object = test_schema_def(resumeMasterSchema_def)
+    if not master_groq_extracted_object:
+        logging.error("Error: resumeMasterSchema_def failed")
+        return False
+    else:
+        logging.info("SUCCESS: master_groq_extracted_mobject extracted")
+    
+    # spwecial testing for master_groq_extracted_object
+    if not test_pydantic_resume(master_groq_extracted_object):
+        logging.error("Error: groq_extracted_object failed PydanticResume test")
+        return False
+    else:
+        logging.info("SUCCESS: groq_extracted_object passed PydanticResume test")
+    
+    return True
+
+
+def test_resume_section_schemas():
+    section_errors = []
+    section_schema_defs = [
+        {
+            "title": "ResumeContactInformationSchema",
+            "schema_path": "./src/resume_contact_information_schema.json",
+            "results_path": "./src/resume-contact-information-resume-results.json",
+            "resume_text_path": os.getenv("RESUME_DOCX_PATH")
+       },
+        {
+            "title": "ResumeEmploymentHistorySchema",
+            "schema_path": "./src/resume_employment_history_schema.json",
+            "results_path": "./src/resume-employment-history-resume-results.json",
+            "resume_text_path": os.getenv("RESUME_DOCX_PATH")
+        },
+        {
+            "title": "ResumeEducationHistorySchema",
+            "schema_path": "./src/resume_education_history_schema.json",
+            "results_path": "./src/resume-education-history-resume-results.json",
+            "resume_text_path": os.getenv("RESUME_DOCX_PATH")
+        },
+        {
+            "title": "ResumeSkillsSchema",
+            "schema_path": "./src/resume_skills_schema.json",
+            "results_path": "./src/resume-skills-resume-results.json",
+            "resume_text_path": os.getenv("RESUME_DOCX_PATH")
+        },
+        {
+            "title": "ResumeProjectsSchema",
+            "schema_path": "./src/resume_projects_schema.json",
+            "results_path": "./src/resume-projects-resume-results.json",
+            "resume_text_path": os.getenv("RESUME_DOCX_PATH")
+        },
+        {
+            "title": "ResumePublicationsSchema",
+            "schema_path": "./src/resume_publications_schema.json",
+            "results_path": "./src/resume-publications-resume-results.json",
+            "resume_text_path": os.getenv("RESUME_DOCX_PATH")
+        }
+    ]
+    
+    for section_schema_def in section_schema_defs:
+        extracted_object = test_schema_def(section_schema_def)
+        if not extracted_object:
+            section_errors.append(f"Error: {section_schema_def['title']} failed")
+            
+    if len(section_errors) > 0:
+        logging.error("section_errors count:", len(section_errors))
+        for error in section_errors:
+            logging.error(error)
+        return False
+    else:
+        return True
+
+if __name__ == "__main__":
+    test_resume_master_schema()
+    # test_resume_section_schemas()
 
 print("!!! DONE !!!")

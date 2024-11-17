@@ -13,7 +13,7 @@ import nltk
 from typing import Optional
 from openai import OpenAI
 from dotenv import load_dotenv
-from src.json_schema_factory import JsonSchemaFactory
+from src.json_schema import JsonSchemaFactory
 from src.pydantic_resume import PydanticResume 
 from src.content_loader import load_docx_data
 

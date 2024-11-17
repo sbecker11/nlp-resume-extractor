@@ -13,7 +13,7 @@ from typing import Optional
 from openai import OpenAI
 from dotenv import load_dotenv
 from src.content_loader import load_docx_data
-from src.json_schema_factory import JsonSchemaFactory, read_json_schema_file
+from src.json_schema import JsonSchemaFactory, read_json_schema_file
 from src.pydantic_resume import PydanticResume
 from pydantic import ValidationError as PydanticValidationError
 

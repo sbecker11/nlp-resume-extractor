@@ -18,59 +18,71 @@
                 "email": {
                     "description": "The candidate's email address, such as 'job@doe.com'",
                     "type": "string",
-                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,7})$"
                 },
                 "phone": {
                     "description": "The candidate's optional phone number, such as '555-123-4567'",
                     "type": ["string", "null"],
-                    "pattern": "^\\+?[1-9]\\d{0,2}[- .]?\\(?\\d{1,4}\\)?[- .]?\\d{1,4}[- .]?\\d{1,9}$"
+                    "default": null,
+                    "pattern": "^\\+?\\d{1,3}?[- .]?\\(?\\d{1,3}?\\)?[- .]?\\d{1,4}[- .]?\\d{1,4}[- .]?\\d{1,4}$"
                 },
                 "address": {
                     "description": "The candidate's optional street address, such as '123 Main St.'",
-                    "type": ["string", "null"]
+                    "type": ["string", "null"],
+                    "default": null
                 },
                 "city": {
                     "description": "The candidate's optional city, such as 'San Francisco'",
-                    "type": ["string", "null"]
+                    "type": ["string", "null"],
+                    "default": null
                 },
                 "state": {
                     "description": "The candidate's optional state or province, such as 'CA' or 'NY'",
-                    "type": ["string", "null"]
+                    "type": ["string", "null"],
+                    "default": null
                 },
                 "zipCode": {
                     "description": "The candidate's optional zipCode or postalCode, such as '94105' or '90210'",
-                    "type": ["string", "null"]
+                    "type": ["string", "null"],
+                    "default": null
                 },
                 "country": {
                     "description": "The candidate's optional country, such as 'USA' or 'Canada'",
-                    "type": "string"
+                    "type": ["string", "null"],
+                    "default": null
                 }
             },
             "required": ["firstName", "lastName", "email"]
         },
-        "introduction" : {
+        "introduction":  {
             "description": "optional chunk of text that serves as the candidate's introduction",
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "default": null
         },
         "projects": {
             "description": "optional chunk of text that lists the candidates current or notable projects",
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "default": null
         },
         "employmentHistory": {
             "description": "optional chunk of text that lists the candidates's history of jobs, each having a company name, candidate's title, duration, and notable tasks",
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "default": null
         },
         "educationHistory": {
             "description": "optional chunk of text that lists the candidate's history of academic degrees, each having a university or college name, a subject such as computer Science, majors, minors, and duration",
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "default": null
         },
         "publications": {
             "description": "optional chunk of text that lists the candidate's publications, websites, blogs, credentials, certifications, licences, patents, etc.",
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "default": null
         },
         "skills": {
             "description": "optional chunk of text that summarizes the candidate's hard and soft skills",
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "default": null
         }
     },
     "required": ["contactInformation"],
