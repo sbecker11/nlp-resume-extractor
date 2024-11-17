@@ -1,0 +1,558 @@
+'contactInformation' is a required property
+
+Failed validating 'required' in schema:
+    {'$schema': 'http://json-schema.org/draft-07/schema#',
+     'title': 'ResumeSchema',
+     'type': 'object',
+     'properties': {'contactInformation': {'description': "The candidate's "
+                                                          'contact '
+                                                          'information '
+                                                          'might include '
+                                                          'firstName, '
+                                                          'lastName, '
+                                                          'email, phone, '
+                                                          'address, city, '
+                                                          'state, zipCode, '
+                                                          'country',
+                                           'type': 'object',
+                                           'properties': {'firstName': {'description': 'The '
+                                                                                       "candidate's "
+                                                                                       'first '
+                                                                                       'name, '
+                                                                                       'such '
+                                                                                       'as '
+                                                                                       "'John' "
+                                                                                       'or '
+                                                                                       "'Jane'",
+                                                                        'type': 'string'},
+                                                          'lastName': {'description': 'The '
+                                                                                      "candidate's "
+                                                                                      'last '
+                                                                                      'name, '
+                                                                                      'such '
+                                                                                      'as '
+                                                                                      "'Doe' "
+                                                                                      'or '
+                                                                                      "'Smith'",
+                                                                       'type': 'string'},
+                                                          'email': {'description': 'The '
+                                                                                   "candidate's "
+                                                                                   'email '
+                                                                                   'address, '
+                                                                                   'such '
+                                                                                   'as '
+                                                                                   "'job@doe.com'",
+                                                                    'type': 'string',
+                                                                    'pattern': '^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,7})$'},
+                                                          'phone': {'description': 'The '
+                                                                                   "candidate's "
+                                                                                   'optional '
+                                                                                   'phone '
+                                                                                   'number, '
+                                                                                   'such '
+                                                                                   'as '
+                                                                                   "'555-123-4567'",
+                                                                    'type': ['string',
+                                                                             'null'],
+                                                                    'default': None,
+                                                                    'pattern': '^\\+?\\d{1,3}?[- '
+                                                                               '.]?\\(?\\d{1,3}?\\)?[- '
+                                                                               '.]?\\d{1,4}[- '
+                                                                               '.]?\\d{1,4}[- '
+                                                                               '.]?\\d{1,4}$'},
+                                                          'address': {'description': 'The '
+                                                                                     "candidate's "
+                                                                                     'optional '
+                                                                                     'street '
+                                                                                     'address, '
+                                                                                     'such '
+                                                                                     'as '
+                                                                                     "'123 "
+                                                                                     'Main '
+                                                                                     "St.'",
+                                                                      'type': ['string',
+                                                                               'null'],
+                                                                      'default': None},
+                                                          'city': {'description': 'The '
+                                                                                  "candidate's "
+                                                                                  'optional '
+                                                                                  'city, '
+                                                                                  'such '
+                                                                                  'as '
+                                                                                  "'San "
+                                                                                  "Francisco'",
+                                                                   'type': ['string',
+                                                                            'null'],
+                                                                   'default': None},
+                                                          'state': {'description': 'The '
+                                                                                   "candidate's "
+                                                                                   'optional '
+                                                                                   'state '
+                                                                                   'or '
+                                                                                   'province, '
+                                                                                   'such '
+                                                                                   'as '
+                                                                                   "'CA' "
+                                                                                   'or '
+                                                                                   "'NY'",
+                                                                    'type': ['string',
+                                                                             'null'],
+                                                                    'default': None},
+                                                          'zipCode': {'description': 'The '
+                                                                                     "candidate's "
+                                                                                     'optional '
+                                                                                     'zipCode '
+                                                                                     'or '
+                                                                                     'postalCode, '
+                                                                                     'such '
+                                                                                     'as '
+                                                                                     "'94105' "
+                                                                                     'or '
+                                                                                     "'90210'",
+                                                                      'type': ['string',
+                                                                               'null'],
+                                                                      'default': None},
+                                                          'country': {'description': 'The '
+                                                                                     "candidate's "
+                                                                                     'optional '
+                                                                                     'country, '
+                                                                                     'such '
+                                                                                     'as '
+                                                                                     "'USA' "
+                                                                                     'or '
+                                                                                     "'Canada'",
+                                                                      'type': ['string',
+                                                                               'null'],
+                                                                      'default': None}},
+                                           'required': ['firstName',
+                                                        'lastName',
+                                                        'email']},
+                    'introduction': {'description': 'optional chunk of '
+                                                    'text that serves as '
+                                                    "the candidate's "
+                                                    'introduction',
+                                     'type': ['string', 'null'],
+                                     'default': None},
+                    'projects': {'description': 'optional chunk of text '
+                                                'that lists the candidates '
+                                                'current or notable '
+                                                'projects',
+                                 'type': ['string', 'null'],
+                                 'default': None},
+                    'employmentHistory': {'description': "The candidate's "
+                                                         'employment '
+                                                         'history as a '
+                                                         'list of '
+                                                         'workHistoryItems '
+                                                         'sorted by their '
+                                                         'durations',
+                                          'type': 'array',
+                                          'items': {'type': 'object',
+                                                    'properties': {'workPositionOrTitle': {'description': 'The '
+                                                                                                          'position '
+                                                                                                          'or '
+                                                                                                          'professional '
+                                                                                                          'title '
+                                                                                                          'of '
+                                                                                                          'the '
+                                                                                                          'candidate, '
+                                                                                                          'while '
+                                                                                                          'working '
+                                                                                                          'at '
+                                                                                                          'this '
+                                                                                                          'company, '
+                                                                                                          'such '
+                                                                                                          'as '
+                                                                                                          "'Software "
+                                                                                                          "Engineer' "
+                                                                                                          'or '
+                                                                                                          "'Data "
+                                                                                                          "Scientist'",
+                                                                                           'type': 'string'},
+                                                                   'workForCompanyName': {'description': 'The '
+                                                                                                         'name '
+                                                                                                         'of '
+                                                                                                         'the '
+                                                                                                         'company '
+                                                                                                         'the '
+                                                                                                         'candidate '
+                                                                                                         'worked '
+                                                                                                         'for',
+                                                                                          'type': 'string'},
+                                                                   'workLocationOrRemote': {'description': 'The '
+                                                                                                           'location '
+                                                                                                           'of '
+                                                                                                           'where '
+                                                                                                           'the '
+                                                                                                           'candidate '
+                                                                                                           'worked '
+                                                                                                           'for '
+                                                                                                           'the '
+                                                                                                           'company, '
+                                                                                                           'like '
+                                                                                                           "'San "
+                                                                                                           'Francisco, '
+                                                                                                           "CA', "
+                                                                                                           'Or '
+                                                                                                           "'Remote' "
+                                                                                                           'if '
+                                                                                                           'the '
+                                                                                                           'candidate '
+                                                                                                           'worked '
+                                                                                                           'from '
+                                                                                                           'home',
+                                                                                            'type': 'string'},
+                                                                   'duration': {'description': 'The '
+                                                                                               'optional '
+                                                                                               'start '
+                                                                                               'and '
+                                                                                               'end '
+                                                                                               'dates '
+                                                                                               'of '
+                                                                                               'the '
+                                                                                               "candidate's "
+                                                                                               'employment '
+                                                                                               'at '
+                                                                                               'the '
+                                                                                               'company',
+                                                                                'type': ['object',
+                                                                                         'null'],
+                                                                                'default': None,
+                                                                                'properties': {'start': {'description': 'The '
+                                                                                                                        'optional '
+                                                                                                                        'start '
+                                                                                                                        'date '
+                                                                                                                        'of '
+                                                                                                                        'the '
+                                                                                                                        "candidate's "
+                                                                                                                        'employment '
+                                                                                                                        'at '
+                                                                                                                        'the '
+                                                                                                                        'company',
+                                                                                                         'type': ['string',
+                                                                                                                  'null'],
+                                                                                                         'default': None,
+                                                                                                         'pattern': '^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$'},
+                                                                                               'end': {'description': 'The '
+                                                                                                                      'optional '
+                                                                                                                      'end '
+                                                                                                                      'date '
+                                                                                                                      'of '
+                                                                                                                      'the '
+                                                                                                                      "candidate's "
+                                                                                                                      'employment '
+                                                                                                                      'at '
+                                                                                                                      'the '
+                                                                                                                      'company',
+                                                                                                       'type': ['string',
+                                                                                                                'null'],
+                                                                                                       'default': None,
+                                                                                                       'pattern': '^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$'}},
+                                                                                'additionalProperties': False},
+                                                                   'workResponsibilitiesAccomplishments': {'description': 'A '
+                                                                                                                          'list '
+                                                                                                                          'of '
+                                                                                                                          'sentences '
+                                                                                                                          'describing '
+                                                                                                                          'the '
+                                                                                                                          "candidate's "
+                                                                                                                          'responsibilities '
+                                                                                                                          'or '
+                                                                                                                          'notable '
+                                                                                                                          'accomplishments '
+                                                                                                                          'during '
+                                                                                                                          'their '
+                                                                                                                          'time '
+                                                                                                                          'at '
+                                                                                                                          'the '
+                                                                                                                          'company',
+                                                                                                           'type': 'array',
+                                                                                                           'items': {'type': 'string'}}},
+                                                    'required': ['workPositionOrTitle',
+                                                                 'workForCompanyName',
+                                                                 'workLocationOrRemote',
+                                                                 'workResponsibilitiesAccomplishments'],
+                                                    'additionalProperties': False}},
+                    'educationHistory': {'description': 'A list of the '
+                                                        "candidate's "
+                                                        'education '
+                                                        'history, '
+                                                        'including '
+                                                        'institutions, '
+                                                        'degrees and '
+                                                        'majors',
+                                         'type': 'array',
+                                         'items': {'type': 'object',
+                                                   'properties': {'institution': {'description': 'The '
+                                                                                                 'name '
+                                                                                                 'of '
+                                                                                                 'the '
+                                                                                                 'institution '
+                                                                                                 'the '
+                                                                                                 'candidate '
+                                                                                                 'attended, '
+                                                                                                 'such '
+                                                                                                 'as '
+                                                                                                 "'Stanford "
+                                                                                                 "University' "
+                                                                                                 'or '
+                                                                                                 "'UC "
+                                                                                                 "Berkeley'",
+                                                                                  'type': 'string'},
+                                                                  'degree': {'description': 'The '
+                                                                                            'degree '
+                                                                                            'the '
+                                                                                            'candidate '
+                                                                                            'earned '
+                                                                                            'at '
+                                                                                            'the '
+                                                                                            'institution, '
+                                                                                            'such '
+                                                                                            'as '
+                                                                                            "'BS' "
+                                                                                            'or '
+                                                                                            "'Bachelor "
+                                                                                            'of '
+                                                                                            "Science', "
+                                                                                            'or '
+                                                                                            "'MFA' "
+                                                                                            'or '
+                                                                                            "'Master "
+                                                                                            'of '
+                                                                                            'Fine '
+                                                                                            "Arts'",
+                                                                             'type': 'string'},
+                                                                  'majors': {'description': 'An '
+                                                                                            'optional '
+                                                                                            'list '
+                                                                                            'of '
+                                                                                            'majors '
+                                                                                            'of '
+                                                                                            'the '
+                                                                                            "candidate's "
+                                                                                            'degree, '
+                                                                                            'such '
+                                                                                            'as '
+                                                                                            "'Computer "
+                                                                                            "Science' "
+                                                                                            'or '
+                                                                                            "'Art "
+                                                                                            "History'",
+                                                                             'type': ['array',
+                                                                                      'null'],
+                                                                             'items': {'type': 'string'}},
+                                                                  'minors': {'description': 'An '
+                                                                                            'optional '
+                                                                                            'list '
+                                                                                            'of '
+                                                                                            'minors '
+                                                                                            'of '
+                                                                                            'the '
+                                                                                            "candidate's "
+                                                                                            'degree, '
+                                                                                            'such '
+                                                                                            'as '
+                                                                                            "'Computer "
+                                                                                            "Science' "
+                                                                                            'or '
+                                                                                            "'Art "
+                                                                                            "History'",
+                                                                             'type': ['array',
+                                                                                      'null'],
+                                                                             'items': {'type': 'string'}},
+                                                                  'gradePointAverage': {'description': 'The '
+                                                                                                       'optional '
+                                                                                                       'grade '
+                                                                                                       'point '
+                                                                                                       'average '
+                                                                                                       '(GPA) '
+                                                                                                       'the '
+                                                                                                       'candidate '
+                                                                                                       'earned '
+                                                                                                       'while '
+                                                                                                       'attending '
+                                                                                                       'the '
+                                                                                                       'institution, '
+                                                                                                       'such '
+                                                                                                       'as '
+                                                                                                       "'3.5' "
+                                                                                                       'or '
+                                                                                                       "'B+'",
+                                                                                        'type': ['string',
+                                                                                                 'null'],
+                                                                                        'default': None},
+                                                                  'duration': {'description': 'The '
+                                                                                              'optional '
+                                                                                              'start '
+                                                                                              'and '
+                                                                                              'end '
+                                                                                              'dates '
+                                                                                              'of '
+                                                                                              'the '
+                                                                                              "candidate's "
+                                                                                              'employment '
+                                                                                              'at '
+                                                                                              'the '
+                                                                                              'company',
+                                                                               'type': ['object',
+                                                                                        'null'],
+                                                                               'default': None,
+                                                                               'properties': {'start': {'description': 'The '
+                                                                                                                       'optional '
+                                                                                                                       'start '
+                                                                                                                       'date '
+                                                                                                                       'of '
+                                                                                                                       'the '
+                                                                                                                       "candidate's "
+                                                                                                                       'employment '
+                                                                                                                       'at '
+                                                                                                                       'the '
+                                                                                                                       'company',
+                                                                                                        'type': ['string',
+                                                                                                                 'null'],
+                                                                                                        'default': None,
+                                                                                                        'pattern': '^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$'},
+                                                                                              'end': {'description': 'The '
+                                                                                                                     'optional '
+                                                                                                                     'end '
+                                                                                                                     'date '
+                                                                                                                     'of '
+                                                                                                                     'the '
+                                                                                                                     "candidate's "
+                                                                                                                     'employment '
+                                                                                                                     'at '
+                                                                                                                     'the '
+                                                                                                                     'company',
+                                                                                                      'type': ['string',
+                                                                                                               'null'],
+                                                                                                      'default': None,
+                                                                                                      'pattern': '^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$'}},
+                                                                               'additionalProperties': False}},
+                                                   'required': ['institution',
+                                                                'degree'],
+                                                   'additionalProperties': False}},
+                    'skills': {'description': 'An optional list of the '
+                                              "candidate's skills, such as "
+                                              "'Python', 'Machine "
+                                              "Learning', 'React', 'Data "
+                                              "Analysis'",
+                               'type': ['array', 'null'],
+                               'default': None,
+                               'items': {'type': 'string'}},
+                    'extraLists': {'description': 'An optional set of '
+                                                  'extra lists of things',
+                                   'type': ['object', 'null'],
+                                   'default': None,
+                                   'properties': {'certifications': {'description': 'An '
+                                                                                    'optional '
+                                                                                    'list '
+                                                                                    'of '
+                                                                                    'the '
+                                                                                    "candidate's "
+                                                                                    'certifications, '
+                                                                                    'such '
+                                                                                    'as '
+                                                                                    "'AWS "
+                                                                                    'Certified '
+                                                                                    'Solutions '
+                                                                                    "Architect', "
+                                                                                    "'Google "
+                                                                                    'Analytics '
+                                                                                    "Certified'",
+                                                                     'type': ['array',
+                                                                              'null'],
+                                                                     'items': {'type': 'string'}},
+                                                  'publications': {'description': 'An '
+                                                                                  'optional '
+                                                                                  'list '
+                                                                                  'of '
+                                                                                  'the '
+                                                                                  "candidate's "
+                                                                                  'publications, '
+                                                                                  'such '
+                                                                                  'as '
+                                                                                  'books, '
+                                                                                  'articles, '
+                                                                                  'or '
+                                                                                  'research '
+                                                                                  'papers',
+                                                                   'type': ['array',
+                                                                            'null'],
+                                                                   'default': None,
+                                                                   'items': {'type': 'string'}},
+                                                  'patents': {'description': 'An '
+                                                                             'optional '
+                                                                             'list '
+                                                                             'of '
+                                                                             'the '
+                                                                             "candidate's "
+                                                                             'patents '
+                                                                             'or '
+                                                                             'inventions',
+                                                              'type': ['array',
+                                                                       'null'],
+                                                              'default': None,
+                                                              'items': {'type': 'string'}},
+                                                  'websites': {'description': 'An '
+                                                                              'optional '
+                                                                              'list '
+                                                                              'of '
+                                                                              'the '
+                                                                              "candidate's "
+                                                                              'websites '
+                                                                              'or '
+                                                                              'online '
+                                                                              'profiles, '
+                                                                              'such '
+                                                                              'as '
+                                                                              'LinkedIn, '
+                                                                              'GitHub, '
+                                                                              'or '
+                                                                              'a '
+                                                                              'URL '
+                                                                              'to '
+                                                                              'their '
+                                                                              'candidateal '
+                                                                              'website',
+                                                               'type': ['array',
+                                                                        'null'],
+                                                               'default': None,
+                                                               'items': {'type': 'string'}}},
+                                   'additionalProperties': False}},
+     'required': ['contactInformation',
+                  'employmentHistory',
+                  'educationHistory'],
+     'additionalProperties': False}
+
+On instance:
+    {'name': 'Shawn Becker',
+     'title': 'Senior Data Engineer',
+     'email': 'sbecker@alum.mit.edu',
+     'phone': '(857) 891-0896',
+     'summary': 'As a senior data engineer with growing machine learning '
+                'expertise, I aim to apply my extensive data management '
+                'skills to the rising field of ML and MLOps.',
+     'experience': [{'company': 'Fannie Mae / Risk Works Analysis Data '
+                                'Lake',
+                     'position': 'Senior Data Engineer',
+                     'dates': 'Mar 2024 – Jun 2024',
+                     'responsibilities': ['Documented processes to build, '
+                                          'test, and deploy data pipeline '
+                                          'components for in-house ETL '
+                                          'framework',
+                                          'Extensive work with SQL, AWS '
+                                          'Redshift, Glue, S3, IAM, '
+                                          'Lambda, REST, Postman, SNS, and '
+                                          'dbt',
+                                          'Utilized Agile practices with '
+                                          'Jira']},
+                    {'company': 'The Cigna Group / Data Cybersecurity',
+                     'position': 'Senior Data Engineer',
+                     'dates': 'Jun 2023 - Dec 2023',
+                     'responsibilities': ['Modernized apps via Jenkins '
+                                          'CI/CD pipeline upgrade',
+                                          'Integrated SetupTools, '
+                                          'Artifactory/PyPI, SonarQube, '
+                                          'and Xray',
+                                          'Ensured privacy and encryption '
+                                          'standards for user data']}]}

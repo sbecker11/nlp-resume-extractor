@@ -2,12 +2,10 @@
 Module for processing, validating, and using any json-schema object
 """
 import json
-import sys
 import os
 from dotenv import load_dotenv
 import logging
-from typing import Optional
-
+import traceback
 # pip install jsonschema
 from jsonschema import Draft7Validator
 from jsonschema.exceptions import ValidationError, SchemaError
@@ -20,9 +18,8 @@ logger = logging.getLogger(__name__)
 
 def read_json_file(json_file:str) -> object:
     """
-    Reads and validates a json schema from a json file 
-    Returns the validated schema, otherwise raises
-    an Error
+    Returns a data object read from a json_file,
+    otherwise raises error
 
     Args:
         json_file (str): The path to the JSON file.
@@ -46,7 +43,34 @@ def read_json_file(json_file:str) -> object:
             raise ValueError(f"Error: invalid json_file: {json_file}")
         
         return json_object
+    
+def write_error_file(error_file :str, error_string: str) -> bool:
+    """
+    Writes the given error string to an error file and returns True
+    if the operation was successful, otherwise raises an error.
 
+    Args:
+        error_file (str): The path to the error file to be written.
+        error_string (str): The string to be written
+    
+    Returns:
+        bool: True if 1) the error_string is written to the error_file,
+        otherwise raises an error
+    
+    Raises:
+        ValueError: Error undefined error file path
+        ValueError: Error writing to to the error file
+    """
+    if error_file is None:
+        raise ValueError("Error undefined error file path")
+    try:
+        with open(error_file, "w", encoding="utf8") as file:
+            file.write(error_string)
+            return True        
+    except Exception as e:
+        logging.error("Error: %s", str(e))
+        raise e
+    
 def read_json_schema_file(json_schema_file:str) -> object:
     """
     Reads a json schema file and returns the validated
@@ -96,19 +120,34 @@ def validate_json_schema_object(json_schema_object: object, known_data_object: o
         validate_data_object(json_schema_object, known_data_object)
         return True
     except ValidationError as e:
-        logger.error("Validation error: %s", str(e))
+        error_message_head = f"Validation error: {e}"
+        error_message = f"{error_message_head}\n\nTraceback:\n{traceback.format_exc()}"
+        error_file = "./errors/validate_json_schema_object_error_1.txt"
+        write_error_file(error_file, error_message)
+        logging.error(error_message_head)
+        logging.error(traceback.format_exc())
         return False
     except SchemaError as e:
-        logger.error("Schema error: %s", str(e))
+        error_message_head = f"Schema error: {e}"
+        error_message = f"{error_message_head}\n\nTraceback:\n{traceback.format_exc()}"
+        error_file = "./errors/validate_json_schema_object_error_2.txt"
+        write_error_file(error_file, error_message)
+        logging.error(error_message_head)
+        logging.error(traceback.format_exc())
         return False
     except Exception as e:
-        logger.error("Error: %s", str(e))
+        error_message_head = f"Exception: {e}"
+        error_message = f"{error_message_head}\n\nTraceback:\n{traceback.format_exc()}"
+        error_file = "./errors/validate_json_schema_object_error_3.txt"
+        write_error_file(error_file, error_message)
+        logging.error(error_message_head)
+        logging.error(traceback.format_exc())
         return False
 
 def validate_data_object(json_schema_object: object, data_object: object) -> bool:
     """
-    Validates a given data object against the given json schema outside of the 
-    JsonSchemaFactory class. Returns True if the data object is valid against the schema,
+    Validates a given data object against the given json schema 
+    Returns True if the data object is valid against the schema,
     raises Errors otherwise.
 
     Args:
@@ -127,27 +166,39 @@ def validate_data_object(json_schema_object: object, data_object: object) -> boo
         Exception: For any other error
     """
     try:
+        if not json_schema_object:
+            raise ValueError("Error: undefined json schema object")
         if not isinstance(json_schema_object, dict):
-            raise ValueError("Error: invalid json schema")
+            raise ValueError(f"Error: invalid json schema object type: {type(json_schema_object)}")
+        if not data_object:
+            raise ValueError("Error: undefined data object")
         if not isinstance(data_object, dict):
-            raise ValueError("Error: invalid data object")
+            raise ValueError(f"Error: invalid data object type: {type(data_object)}")
 
         validator = get_json_schema_validator(json_schema_object)
         validator.validate(instance=data_object)
         return True
 
     except ValueError as e:
-        logger.error("Value error: %s", str(e))
+        error_file = "./errors/validate_data_object_error_1.txt"
+        logger.error("Value error. See error in %s", error_file)
+        write_error_file(error_file, str(e))
         raise
     except ValidationError as e:
-        logger.error("Validation error: %s", str(e))
-        raise
+        error_file = "./errors/validate_data_object_error_2.txt"
+        logger.error("Validation error. See error in %s", error_file)
+        write_error_file(error_file, str(e))
+        raise e
     except SchemaError as e:
-        logger.error("Schema validation error: %s", str(e))
-        raise
+        error_file = "./errors/validate_data_object_error_3.txt"
+        logger.error("Schema error. See error in %s", error_file)
+        write_error_file(error_file, str(e))
+        raise e
     except Exception as e:
-        logger.error("Error: %s", str(e))
-        raise
+        error_file = "./errors/validate_data_object_error_4.txt"
+        logger.error("Exception. See error in %s", error_file)
+        write_error_file(error_file, str(e))
+        raise e
 
 def get_json_schema_validator(json_schema_object: object) -> Draft7Validator:
     """
@@ -171,9 +222,15 @@ def get_json_schema_validator(json_schema_object: object) -> Draft7Validator:
 if __name__ == "__main__":
     load_dotenv()
 
-    resume_schema_object = read_json_schema_file(os.getenv("RESUME_SCHEMA_PATH"))
+    resume_schema_path = os.getenv("RESUME_SCHEMA_PATH")
+    if resume_schema_path is None:
+        raise ValueError("RESUME_SCHEMA_PATH environment variable is not set")
+    resume_schema_object = read_json_schema_file(resume_schema_path)
     logger.info("SUCCESS: resume_schema_object is valid against Draft7Validator")
     
-    test_data_object = read_json_file(os.getenv("TEST_DATA_OBJECT_PATH"))
+    test_data_object_path = os.getenv("TEST_DATA_OBJECT_PATH")
+    if test_data_object_path is None:
+        raise ValueError("TEST_DATA_OBJECT_PATH environment variable is not set")
+    test_data_object = read_json_file(test_data_object_path)
     validate_json_schema_object(resume_schema_object, test_data_object)
     logger.info("SUCCESS: resume_schema_object is valid against test_data_object_path")

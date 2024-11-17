@@ -139,9 +139,9 @@ def test_pydantic_resume( groc_resume_object) -> bool:
         bool: True if successful, False otherwise
     """
     try:
-        pydantic_json_schema = PydanticResume.model_json_schema()
-        print("Pydantic JSON schema:")
-        print(json.dumps(pydantic_json_schema, indent=2))
+        # pydantic_json_schema = PydanticResume.model_json_schema()
+        # print("Pydantic JSON schema:")
+        # print(json.dumps(pydantic_json_schema, indent=2))
         
         # if this works, the groq_resume_object is valid
         # againt the pydantic_resume model
@@ -155,8 +155,8 @@ def test_pydantic_resume( groc_resume_object) -> bool:
         return True
 
     except PydanticValidationError as e:
-        print("groq_resume_object is invalid against the PydanticResume model.")
-        print(str(e))
+        error_file = "./errors/pydantic_validation_error.txt"
+        print("groq_resume_object is invalid against the PydanticResume model. Error saved to: %s", error_file)
         return False
 
 def test_resume_master_schema():
@@ -167,21 +167,35 @@ def test_resume_master_schema():
     resumeMasterSchema_def = {
         "title": "ResumeSchema",
         "schema_path": "./src/resume-schema.json",
-        "results_path": "./src/resume-schema-resume-results.json",
+        "results_path": "./results/resume-schema-results.json",
         "resume_text_path": os.getenv("RESUME_DOCX_PATH"),
         "data_object_path": os.getenv("TEST_DATA_OBJECT_PATH")
     }
-    master_groq_extracted_object = test_schema_def(resumeMasterSchema_def)
-    if not master_groq_extracted_object:
+    groq_extracted_object = test_schema_def(resumeMasterSchema_def)
+    if not groq_extracted_object:
         logging.error("Error: resumeMasterSchema_def failed")
         return False
     else:
         logging.info("SUCCESS: master_groq_extracted_mobject extracted")
     
-    # spwecial testing for master_groq_extracted_object
-    if not test_pydantic_resume(master_groq_extracted_object):
-        logging.error("Error: groq_extracted_object failed PydanticResume test")
-        return False
+    # now validate the groq_extracted_object with the resume_schema
+    resume_schema_object = json_schema.read_json_schema_file(resumeMasterSchema_def['schema_path'])
+    try:
+        json_schema.validate_data_object(resume_schema_object, groq_extracted_object)
+    except Exception as e:
+        error_file = "./errors/schema_validation_error.txt"
+        logging.error("Error: groq_extracted_object failed schema validation. Error saved to: %s", error_file)
+        json_schema.write_error_file(error_file, str(e))
+    else:
+        logging.info("SUCCESS: groq_extracted_object passed schema validation")
+    
+    # special pydantic_resume testing for master groq_extracted_object
+    try:
+        test_pydantic_resume(groq_extracted_object)
+    except PydanticValidationError as e:
+        error_file = "./errors/pydantic_validation_error.txt"
+        logging.error("Error: groq_extracted_object failed Pydantic validation. Error saved to: %s", error_file)
+        json_schema.write_error_file(error_file, str(e))
     else:
         logging.info("SUCCESS: groq_extracted_object passed PydanticResume test")
     
@@ -193,49 +207,62 @@ def test_resume_section_schemas():
     section_schema_defs = [
         {
             "title": "ResumeContactInformationSchema",
-            "schema_path": "./src/resume_contact_information_schema.json",
-            "results_path": "./src/resume-contact-information-resume-results.json",
+            "schema_path": "./src/resume-contact-information-schema.json",
+            "results_path": "./results/resume-contact-information-results.json",
             "resume_text_path": os.getenv("RESUME_DOCX_PATH")
        },
         {
             "title": "ResumeEmploymentHistorySchema",
             "schema_path": "./src/resume_employment_history_schema.json",
-            "results_path": "./src/resume-employment-history-resume-results.json",
+            "results_path": "./results/resume-employment-history-results.json",
             "resume_text_path": os.getenv("RESUME_DOCX_PATH")
         },
         {
             "title": "ResumeEducationHistorySchema",
             "schema_path": "./src/resume_education_history_schema.json",
-            "results_path": "./src/resume-education-history-resume-results.json",
+            "results_path": "./results/resume-education-history-results.json",
             "resume_text_path": os.getenv("RESUME_DOCX_PATH")
         },
         {
             "title": "ResumeSkillsSchema",
             "schema_path": "./src/resume_skills_schema.json",
-            "results_path": "./src/resume-skills-resume-results.json",
+            "results_path": "./results/resume-skills-results.json",
             "resume_text_path": os.getenv("RESUME_DOCX_PATH")
         },
         {
             "title": "ResumeProjectsSchema",
             "schema_path": "./src/resume_projects_schema.json",
-            "results_path": "./src/resume-projects-resume-results.json",
+            "results_path": "./results/resume-projects-results.json",
             "resume_text_path": os.getenv("RESUME_DOCX_PATH")
         },
         {
             "title": "ResumePublicationsSchema",
             "schema_path": "./src/resume_publications_schema.json",
-            "results_path": "./src/resume-publications-resume-results.json",
+            "results_path": "./results/resume-publications-results.json",
             "resume_text_path": os.getenv("RESUME_DOCX_PATH")
         }
     ]
     
     for section_schema_def in section_schema_defs:
+        title = section_schema_def['title']
         extracted_object = test_schema_def(section_schema_def)
         if not extracted_object:
-            section_errors.append(f"Error: {section_schema_def['title']} failed")
+            section_errors.append(f"Error: {title} extraction failure")
+        else:
+            logging.info(f"SUCCESS: {title} extraction successful")
+            try:
+                json_schema.validate_data_object(section_schema_def['schema_path'], extracted_object)
+            except Exception as f:
+                error_file = f"errors/{title}_extracted_object_validation_error.txt"
+                logging.error(f"Error: {title} extracted object failed schema validation. Error saved to: %s", error_file)
+                json_schema.write_error_file(error_file, str(f))
+                section_errors.append(f)
+        # break after the first section
+        break
             
     if len(section_errors) > 0:
-        logging.error("section_errors count:", len(section_errors))
+        
+        logging.error("section_errors count: %d", len(section_errors))
         for error in section_errors:
             logging.error(error)
         return False
@@ -244,6 +271,6 @@ def test_resume_section_schemas():
 
 if __name__ == "__main__":
     test_resume_master_schema()
-    # test_resume_section_schemas()
+    test_resume_section_schemas()
 
 print("!!! DONE !!!")
